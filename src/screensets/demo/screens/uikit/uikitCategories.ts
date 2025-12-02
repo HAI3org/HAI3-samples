@@ -110,11 +110,11 @@ export const UIKIT_CATEGORIES: UIKitCategory[] = [
     label: 'Overlays & Popovers',
     translationKey: 'category_overlays',
     elements: [
-      'Popover',
-      'Tooltip',
-      'Hover Card',
       'Context Menu',
       'Dropdown Menu',
+      'Hover Card',
+      'Popover',
+      'Tooltip',
     ],
   },
   {
@@ -165,11 +165,18 @@ export function getElementId(elementName: string): string {
  * Currently implemented elements (matching UIKitElementsScreen)
  */
 export const IMPLEMENTED_ELEMENTS = [
+  'Accordion',
   'Avatar',
   'Badge',
   'Button',
   'Card',
+  'Carousel',
+  'Collapsible',
+  'Context Menu',
   'Dialog',
+  'Dropdown Menu',
+  'Hover Card',
+  'Popover',
   'Progress',
   'Select',
   'Sheet',

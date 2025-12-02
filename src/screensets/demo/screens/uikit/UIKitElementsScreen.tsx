@@ -8,6 +8,7 @@ import { FeedbackElements } from '../../components/FeedbackElements';
 import { MediaElements } from '../../components/MediaElements';
 import { FormElements } from '../../components/FormElements';
 import { OverlayElements } from '../../components/OverlayElements';
+import { DisclosureElements } from '../../components/DisclosureElements';
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../../ids";
 import { DEMO_SCREENSET_ID } from "../../ids";
 import { UIKIT_CATEGORIES, IMPLEMENTED_ELEMENTS, getElementId } from './uikitCategories';
@@ -130,6 +131,8 @@ export const UIKitElementsScreen: React.FC = () => {
         return <FormElements />;
       case 'overlays':
         return <OverlayElements />;
+      case 'disclosure':
+        return <DisclosureElements />;
       default:
         return (
           <div className="flex items-center justify-center h-64">

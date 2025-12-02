@@ -50,7 +50,7 @@ export interface ColorScale {
 
 const colors: TailwindColors = {
   "inherit": "inherit",
-  "current": "currentColor",
+  "current": "hsl(0 0% NaN%)",
   "transparent": "transparent",
   "black": "hsl(0 0% 0%)",
   "white": "hsl(0 0% 100%)",

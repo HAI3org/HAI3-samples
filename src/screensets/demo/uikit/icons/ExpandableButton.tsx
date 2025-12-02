@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronDown } from 'lucide-react';
 import { TextLoader } from '@hai3/uicore';
 
 export interface ExpandableButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -55,7 +56,7 @@ export const ExpandableButton: React.FC<ExpandableButtonProps> = ({
   const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : '';
   
   // Chevron styles
-  const chevronStyles = `text-xs transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`;
+  const chevronStyles = `h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`;
 
   return (
     <button
@@ -74,9 +75,7 @@ export const ExpandableButton: React.FC<ExpandableButtonProps> = ({
         )}
       </span>
       {showChevron && (
-        <span className={chevronStyles} aria-hidden="true">
-          ▶
-        </span>
+        <ChevronDown className={chevronStyles} aria-hidden="true" />
       )}
     </button>
   );

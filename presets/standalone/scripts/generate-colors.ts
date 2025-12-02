@@ -31,9 +31,9 @@ interface ColorScale {
  * @param hex - Hex color string
  * @returns HSL color string
  */
-function hexToHsl(hex: string): string {
+function hexToHsl(hex: ModernColorName | string): string {
   // Handle special cases
-  if (hex === 'inherit' || hex === 'currentColor' || hex === 'transparent') {
+  if (hex === ModernColorName.Inherit || hex === ModernColorName.Current || hex === ModernColorName.Transparent) {
     return hex;
   }
 
@@ -85,43 +85,43 @@ function hexToHsl(hex: string): string {
 }
 
 // Modern Tailwind color names (excludes deprecated: lightBlue, warmGray, trueGray, coolGray, blueGray)
-const modernColorNames = [
-  'inherit',
-  'current',
-  'transparent',
-  'black',
-  'white',
-  'slate',
-  'gray',
-  'zinc',
-  'neutral',
-  'stone',
-  'red',
-  'orange',
-  'amber',
-  'yellow',
-  'lime',
-  'green',
-  'emerald',
-  'teal',
-  'cyan',
-  'sky',
-  'blue',
-  'indigo',
-  'violet',
-  'purple',
-  'fuchsia',
-  'pink',
-  'rose',
-] as const;
+enum ModernColorName {
+  Inherit = 'inherit',
+  Current = 'current',
+  Transparent = 'transparent',
+  Black = 'black',
+  White = 'white',
+  Slate = 'slate',
+  Gray = 'gray',
+  Zinc = 'zinc',
+  Neutral = 'neutral',
+  Stone = 'stone',
+  Red = 'red',
+  Orange = 'orange',
+  Amber = 'amber',
+  Yellow = 'yellow',
+  Lime = 'lime',
+  Green = 'green',
+  Emerald = 'emerald',
+  Teal = 'teal',
+  Cyan = 'cyan',
+  Sky = 'sky',
+  Blue = 'blue',
+  Indigo = 'indigo',
+  Violet = 'violet',
+  Purple = 'purple',
+  Fuchsia = 'fuchsia',
+  Pink = 'pink',
+  Rose = 'rose'
+}
 
 // Convert all colors to HSL
 const colors: Record<string, unknown> = {};
 
-for (const colorName of modernColorNames) {
+for (const colorName of Object.values(ModernColorName)) {
   const colorValue = allColors[colorName as keyof typeof allColors];
   if (typeof colorValue === 'string') {
-    // Simple color (inherit, currentColor, transparent, black, white)
+    // Simple color (inherit, current, transparent, black, white)
     colors[colorName] = hexToHsl(colorValue);
   } else if (typeof colorValue === 'object' && colorValue !== null) {
     // Color scale (slate, gray, etc.)

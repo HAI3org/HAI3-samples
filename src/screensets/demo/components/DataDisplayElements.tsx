@@ -74,22 +74,22 @@ export const DataDisplayElements: React.FC = () => {
             <div className="flex w-full flex-wrap gap-2 justify-center">
               <Badge>
                 <TextLoader skeletonClassName="h-4 w-12" inheritColor>
-                  {t(`screenset.${DEMO_SCREENSET_ID}:screens.${UI_KIT_ELEMENTS_SCREEN_ID}.badge_default`)}
+                  {tk('badge_default')}
                 </TextLoader>
               </Badge>
               <Badge variant="secondary">
                 <TextLoader skeletonClassName="h-3.5 w-14" inheritColor>
-                  {t(`screenset.${DEMO_SCREENSET_ID}:screens.${UI_KIT_ELEMENTS_SCREEN_ID}.badge_secondary`)}
+                  {tk('badge_secondary')}
                 </TextLoader>
               </Badge>
               <Badge variant="destructive">
                 <TextLoader skeletonClassName="h-4 w-20" inheritColor>
-                  {t(`screenset.${DEMO_SCREENSET_ID}:screens.${UI_KIT_ELEMENTS_SCREEN_ID}.badge_destructive`)}
+                  {tk('badge_destructive')}
                 </TextLoader>
               </Badge>
               <Badge variant="outline">
                 <TextLoader skeletonClassName="h-3.5 w-14" inheritColor>
-                  {t(`screenset.${DEMO_SCREENSET_ID}:screens.${UI_KIT_ELEMENTS_SCREEN_ID}.badge_outline`)}
+                  {tk('badge_outline')}
                 </TextLoader>
               </Badge>
             </div>
@@ -100,7 +100,7 @@ export const DataDisplayElements: React.FC = () => {
               >
                 <BadgeCheckIcon className="w-3 h-3" />
                 <TextLoader skeletonClassName="h-3.5 w-10" inheritColor>
-                  {t(`screenset.${DEMO_SCREENSET_ID}:screens.${UI_KIT_ELEMENTS_SCREEN_ID}.badge_verified`)}
+                  {tk('badge_verified')}
                 </TextLoader>
               </Badge>
               <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">

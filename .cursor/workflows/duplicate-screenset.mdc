@@ -1,9 +1,0 @@
-# Workflow: Duplicate Screenset
-
-This workflow references the canonical process in `.ai/workflows/DUPLICATE_SCREENSET.md`.
-
-## Purpose
-Duplicate an existing screenset with all IDs changed.
-
-## Usage
-Open and follow `.ai/workflows/DUPLICATE_SCREENSET.md`.
