@@ -1,0 +1,11 @@
+{
+  "title": "Active Alerts",
+  "subtitle": "All active alerts across your infrastructure",
+  "no_alerts": "No active alerts",
+  "alert_time": "Alert time",
+  "alert_type": "Alert type",
+  "alert_severity": "Alert severity",
+  "device_name": "Device name",
+  "plan_name": "Plan name",
+  "alert_message": "Alert message"
+}

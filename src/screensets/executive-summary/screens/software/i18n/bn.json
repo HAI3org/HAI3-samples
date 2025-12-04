@@ -1,0 +1,11 @@
+{
+  "title": "Software Inventory",
+  "subtitle": "Software installed across all devices",
+  "no_software": "No software inventory available",
+  "software_name": "Software name",
+  "software_version": "Software version",
+  "vendor_name": "Vendor name",
+  "status": "Status",
+  "date_installed": "Date installed",
+  "scan_time": "Scan time"
+}

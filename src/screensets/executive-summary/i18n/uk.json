@@ -1,0 +1,13 @@
+{
+  "screens": {
+    "dashboard": {
+      "title": "Dashboard"
+    },
+    "alerts": {
+      "title": "Alerts"
+    },
+    "software": {
+      "title": "Software Inventory"
+    }
+  }
+}
