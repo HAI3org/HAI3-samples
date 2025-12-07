@@ -86,6 +86,14 @@ export const draculaLargeTheme: Theme = {
       selected: dracula.purple,
       border: dracula.currentLine,
     },
+    // Chart colors for data visualization (OKLCH format, Dracula-inspired palette)
+    chart: {
+      1: 'oklch(0.714 0.203 313.26)',   // purple (Dracula purple)
+      2: 'oklch(0.799 0.194 145.19)',   // green (Dracula green)
+      3: 'oklch(0.821 0.173 85.29)',    // yellow (Dracula yellow)
+      4: 'oklch(0.71 0.191 349.76)',    // pink (Dracula pink)
+      5: 'oklch(0.822 0.131 194.77)',   // cyan (Dracula cyan)
+    },
   },
   spacing: {
     xs: '0.375rem',   // 1.5x

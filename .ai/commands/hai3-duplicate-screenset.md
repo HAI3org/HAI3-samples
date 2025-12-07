@@ -8,7 +8,7 @@
 
 REQUIRED: Copy folder and update ids.ts only (2 steps, 96% reduction).
 REQUIRED: Pass arch:check with zero errors.
-REQUIRED: Test via Chrome MCP (never skip).
+REQUIRED: Test via Chrome DevTools MCP (never skip).
 
 ## GATHER REQUIREMENTS
 Ask user for:
@@ -38,7 +38,7 @@ npm run lint
 grep -rn "OLD_SCREENSET_ID" src/screensets/TARGET/  # Must return 0 matches
 ```
 
-## STEP 3: Test via Chrome MCP
+## STEP 3: Test via Chrome DevTools MCP
 STOP: If MCP connection is broken, fix it first. NEVER skip testing.
 - npm run dev.
 - Verify TARGET in screenset selector.
@@ -55,4 +55,4 @@ STOP: If MCP connection is broken, fix it first. NEVER skip testing.
 - [ ] Run arch:check (MUST pass).
 - [ ] Run lint (MUST pass).
 - [ ] Verify zero occurrences of old screenset ID.
-- [ ] Test via Chrome MCP (NEVER skip).
+- [ ] Test via Chrome DevTools MCP (NEVER skip).

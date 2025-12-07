@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, ButtonVariant, ButtonSize, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Sheet, SheetTrigger, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, Avatar, AvatarImage, AvatarFallback, Badge } from '@hai3/uikit';
+import { AspectRatio, Button, ButtonVariant, ButtonSize, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, ResizablePanelGroup, ResizablePanel, ResizableHandle, ScrollArea, ScrollBar, Separator, Sheet, SheetTrigger, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, Avatar, AvatarImage, AvatarFallback, Badge } from '@hai3/uikit';
 import { useTranslation, TextLoader } from '@hai3/uicore';
 import { FormInput } from '../uikit/icons/FormInput';
+import { FormLabel } from '../uikit/icons/FormLabel';
 import { DEMO_SCREENSET_ID } from "../ids";
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../ids";
 
@@ -18,6 +19,52 @@ export const LayoutElements: React.FC = () => {
 
   return (
     <>
+      {/* Aspect Ratio Element Block */}
+      <div data-element-id="element-aspect-ratio" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-32">
+          <h2 className="text-2xl font-semibold">
+            {tk('aspect_ratio_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* 16:9 Aspect Ratio */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('aspect_ratio_16_9_label')}
+              </label>
+            </TextLoader>
+            <div className="w-full max-w-md">
+              <AspectRatio ratio={16 / 9}>
+                <img
+                  src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+                  alt="Landscape"
+                  className="h-full w-full rounded-md object-cover"
+                />
+              </AspectRatio>
+            </div>
+          </div>
+
+          {/* 1:1 Aspect Ratio */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('aspect_ratio_1_1_label')}
+              </label>
+            </TextLoader>
+            <div className="w-full max-w-xs">
+              <AspectRatio ratio={1}>
+                <img
+                  src="https://images.unsplash.com/photo-1535025183041-0991a977e25b?w=600&dpr=2&q=80"
+                  alt="Mountains"
+                  className="h-full w-full rounded-md object-cover"
+                />
+              </AspectRatio>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Card Element Block */}
       <div data-element-id="element-card" className="flex flex-col gap-4">
         <TextLoader skeletonClassName="h-8 w-24">
@@ -147,9 +194,9 @@ export const LayoutElements: React.FC = () => {
                   <div className="flex flex-col gap-6">
                     <div className="grid gap-2">
                       <TextLoader skeletonClassName="h-4 w-12" inheritColor>
-                        <label htmlFor="email" className="text-sm font-medium">
+                        <FormLabel htmlFor="email">
                           {tk('card_form_email_label')}
-                        </label>
+                        </FormLabel>
                       </TextLoader>
                       <FormInput
                         id="email"
@@ -161,9 +208,9 @@ export const LayoutElements: React.FC = () => {
                     <div className="grid gap-2">
                       <div className="flex items-center">
                         <TextLoader skeletonClassName="h-4 w-16" inheritColor>
-                          <label htmlFor="password" className="text-sm font-medium">
+                          <FormLabel htmlFor="password">
                             {tk('card_form_password_label')}
-                          </label>
+                          </FormLabel>
                         </TextLoader>
                         <TextLoader skeletonClassName="h-4 w-32 ml-auto" inheritColor>
                           <a
@@ -234,9 +281,9 @@ export const LayoutElements: React.FC = () => {
                 <div className="grid gap-4">
                   <div className="grid gap-3">
                     <TextLoader skeletonClassName="h-4 w-12" inheritColor>
-                      <label htmlFor="name-1" className="text-sm font-medium">
+                      <FormLabel htmlFor="name-1">
                         {tk('dialog_name_label')}
-                      </label>
+                      </FormLabel>
                     </TextLoader>
                     <FormInput
                       id="name-1"
@@ -247,9 +294,9 @@ export const LayoutElements: React.FC = () => {
                   </div>
                   <div className="grid gap-3">
                     <TextLoader skeletonClassName="h-4 w-20" inheritColor>
-                      <label htmlFor="username-1" className="text-sm font-medium">
+                      <FormLabel htmlFor="username-1">
                         {tk('dialog_username_label')}
-                      </label>
+                      </FormLabel>
                     </TextLoader>
                     <FormInput
                       id="username-1"
@@ -327,6 +374,282 @@ export const LayoutElements: React.FC = () => {
         </div>
       </div>
 
+      {/* Drawer Element Block */}
+      <div data-element-id="element-drawer" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-24">
+          <h2 className="text-2xl font-semibold">
+            {tk('drawer_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex items-center justify-center gap-4 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant={ButtonVariant.Outline}>
+                <TextLoader skeletonClassName="h-5 w-24" inheritColor>
+                  {tk('drawer_open')}
+                </TextLoader>
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>
+                  <TextLoader skeletonClassName="h-6 w-32" inheritColor>
+                    {tk('drawer_title')}
+                  </TextLoader>
+                </DrawerTitle>
+                <DrawerDescription>
+                  <TextLoader skeletonClassName="h-4 w-full" inheritColor>
+                    {tk('drawer_description')}
+                  </TextLoader>
+                </DrawerDescription>
+              </DrawerHeader>
+              <div className="p-4">
+                <TextLoader skeletonClassName="h-4 w-full" inheritColor>
+                  <p className="text-sm text-muted-foreground">
+                    {tk('drawer_content')}
+                  </p>
+                </TextLoader>
+              </div>
+              <DrawerFooter>
+                <Button type="submit">
+                  <TextLoader skeletonClassName="h-5 w-16" inheritColor>
+                    {tk('drawer_submit')}
+                  </TextLoader>
+                </Button>
+                <DrawerClose asChild>
+                  <Button variant={ButtonVariant.Outline}>
+                    <TextLoader skeletonClassName="h-5 w-16" inheritColor>
+                      {tk('drawer_close')}
+                    </TextLoader>
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      </div>
+
+      {/* Resizable Element Block */}
+      <div data-element-id="element-resizable" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-32">
+          <h2 className="text-2xl font-semibold">
+            {tk('resizable_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Horizontal Resizable */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('resizable_horizontal_label')}
+              </label>
+            </TextLoader>
+            <ResizablePanelGroup
+              direction="horizontal"
+              className="min-h-[200px] max-w-md rounded-lg border"
+            >
+              <ResizablePanel defaultSize={50}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                    <span className="font-semibold">{tk('resizable_panel_one')}</span>
+                  </TextLoader>
+                </div>
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={50}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                    <span className="font-semibold">{tk('resizable_panel_two')}</span>
+                  </TextLoader>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+
+          {/* Vertical Resizable */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('resizable_vertical_label')}
+              </label>
+            </TextLoader>
+            <ResizablePanelGroup
+              direction="vertical"
+              className="min-h-[300px] max-w-md rounded-lg border"
+            >
+              <ResizablePanel defaultSize={25}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                    <span className="font-semibold">{tk('resizable_panel_one')}</span>
+                  </TextLoader>
+                </div>
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel defaultSize={75}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                    <span className="font-semibold">{tk('resizable_panel_two')}</span>
+                  </TextLoader>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+
+          {/* Nested Resizable (Horizontal + Vertical) */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('resizable_nested_label')}
+              </label>
+            </TextLoader>
+            <ResizablePanelGroup
+              direction="horizontal"
+              className="min-h-[200px] max-w-md rounded-lg border"
+            >
+              <ResizablePanel defaultSize={50}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                    <span className="font-semibold">{tk('resizable_panel_one')}</span>
+                  </TextLoader>
+                </div>
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel defaultSize={50}>
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel defaultSize={25}>
+                    <div className="flex h-full items-center justify-center p-6">
+                      <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                        <span className="font-semibold">{tk('resizable_panel_two')}</span>
+                      </TextLoader>
+                    </div>
+                  </ResizablePanel>
+                  <ResizableHandle />
+                  <ResizablePanel defaultSize={75}>
+                    <div className="flex h-full items-center justify-center p-6">
+                      <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                        <span className="font-semibold">{tk('resizable_panel_three')}</span>
+                      </TextLoader>
+                    </div>
+                  </ResizablePanel>
+                </ResizablePanelGroup>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll Area Element Block */}
+      <div data-element-id="element-scroll-area" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-32">
+          <h2 className="text-2xl font-semibold">
+            {tk('scroll_area_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Vertical Scroll Area */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('scroll_area_vertical_label')}
+              </label>
+            </TextLoader>
+            <ScrollArea className="h-72 w-48 rounded-md border">
+              <div className="p-4">
+                <TextLoader skeletonClassName="h-4 w-12" inheritColor>
+                  <h4 className="mb-4 text-sm leading-none font-medium">
+                    {tk('scroll_area_tags_title')}
+                  </h4>
+                </TextLoader>
+                {Array.from({ length: 50 }).map((_, i, a) => (
+                  <React.Fragment key={i}>
+                    <div className="text-sm">v1.2.0-beta.{a.length - i}</div>
+                    <div className="my-2 h-px bg-border" />
+                  </React.Fragment>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          {/* Horizontal Scroll Area */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('scroll_area_horizontal_label')}
+              </label>
+            </TextLoader>
+            <ScrollArea className="w-96 rounded-md border whitespace-nowrap">
+              <div className="flex w-max space-x-4 p-4">
+                {[
+                  { artist: 'Ornella Binni', art: 'https://images.unsplash.com/photo-1465869185982-5a1a7522cbcb?auto=format&fit=crop&w=300&q=80' },
+                  { artist: 'Tom Byrom', art: 'https://images.unsplash.com/photo-1548516173-3cabfa4607e9?auto=format&fit=crop&w=300&q=80' },
+                  { artist: 'Vladimir Malyavko', art: 'https://images.unsplash.com/photo-1494337480532-3725c85fd2ab?auto=format&fit=crop&w=300&q=80' },
+                ].map((artwork) => (
+                  <figure key={artwork.artist} className="shrink-0">
+                    <div className="overflow-hidden rounded-md">
+                      <img
+                        src={artwork.art}
+                        alt={`Photo by ${artwork.artist}`}
+                        className="aspect-[3/4] h-fit w-fit object-cover"
+                        width={300}
+                        height={400}
+                      />
+                    </div>
+                    <figcaption className="text-muted-foreground pt-2 text-xs whitespace-normal">
+                      <TextLoader skeletonClassName="h-3 w-20" inheritColor>
+                        {tk('scroll_area_photo_by')}{' '}
+                        <span className="text-foreground font-semibold">
+                          {artwork.artist}
+                        </span>
+                      </TextLoader>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        </div>
+      </div>
+
+      {/* Separator Element Block */}
+      <div data-element-id="element-separator" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-32">
+          <h2 className="text-2xl font-semibold">
+            {tk('separator_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          <div>
+            <div className="space-y-1">
+              <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+                <h4 className="text-sm leading-none font-medium">
+                  {tk('separator_title')}
+                </h4>
+              </TextLoader>
+              <TextLoader skeletonClassName="h-4 w-48" inheritColor>
+                <p className="text-muted-foreground text-sm">
+                  {tk('separator_description')}
+                </p>
+              </TextLoader>
+            </div>
+            <Separator className="my-4" />
+            <div className="flex h-5 items-center space-x-4 text-sm">
+              <TextLoader skeletonClassName="h-4 w-8" inheritColor>
+                <div>{tk('separator_blog')}</div>
+              </TextLoader>
+              <Separator orientation="vertical" />
+              <TextLoader skeletonClassName="h-4 w-8" inheritColor>
+                <div>{tk('separator_docs')}</div>
+              </TextLoader>
+              <Separator orientation="vertical" />
+              <TextLoader skeletonClassName="h-4 w-12" inheritColor>
+                <div>{tk('separator_source')}</div>
+              </TextLoader>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Sheet Element Block */}
       <div data-element-id="element-sheet" className="flex flex-col gap-4">
         <TextLoader skeletonClassName="h-8 w-24">
@@ -356,12 +679,12 @@ export const LayoutElements: React.FC = () => {
                   </TextLoader>
                 </SheetDescription>
               </SheetHeader>
-              <div className="grid flex-1 auto-rows-min gap-6 px-4">
+              <div className="grid flex-1 auto-rows-min gap-6 px-4 py-4">
                 <div className="grid gap-3">
                   <TextLoader skeletonClassName="h-4 w-12" inheritColor>
-                    <label htmlFor="sheet-demo-name" className="text-sm font-medium">
+                    <FormLabel htmlFor="sheet-demo-name">
                       {tk('sheet_name_label')}
-                    </label>
+                    </FormLabel>
                   </TextLoader>
                   <FormInput
                     id="sheet-demo-name"
@@ -371,9 +694,9 @@ export const LayoutElements: React.FC = () => {
                 </div>
                 <div className="grid gap-3">
                   <TextLoader skeletonClassName="h-4 w-20" inheritColor>
-                    <label htmlFor="sheet-demo-username" className="text-sm font-medium">
+                    <FormLabel htmlFor="sheet-demo-username">
                       {tk('sheet_username_label')}
-                    </label>
+                    </FormLabel>
                   </TextLoader>
                   <FormInput
                     id="sheet-demo-username"

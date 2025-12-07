@@ -100,6 +100,10 @@ export default [
       'local/no-coordinator-effects': 'off',
       'local/no-missing-domain-id': 'off',
       'local/domain-event-format': 'off',
+      // Component Decomposition: Enabled globally
+      'local/no-inline-styles': 'error',
+      'local/uikit-no-business-logic': 'off', // Enabled for screensets/*/uikit/ only
+      'local/screen-inline-components': 'off', // Enabled for screensets/**/screens/ only
 
       // Flux Architecture: No direct store.dispatch
       'no-restricted-syntax': [
@@ -148,6 +152,24 @@ export default [
       'local/no-coordinator-effects': 'error',
       'local/no-missing-domain-id': 'error',
       'local/domain-event-format': 'error',
+    },
+  },
+
+  // Screensets UIKit: Presentational components only (no @hai3/uicore)
+  // Note: Only applies to screensets/{name}/uikit/, not screens/uikit/ (which is a screen folder)
+  {
+    files: ['src/screensets/*/uikit/**/*.{ts,tsx}'],
+    ignores: ['src/screensets/*/uikit/icons/**/*'],
+    rules: {
+      'local/uikit-no-business-logic': 'error',
+    },
+  },
+
+  // Screens: Detect inline component definitions (arch:check enforced)
+  {
+    files: ['src/screensets/**/screens/**/*Screen.tsx'],
+    rules: {
+      'local/screen-inline-components': 'error',
     },
   },
 

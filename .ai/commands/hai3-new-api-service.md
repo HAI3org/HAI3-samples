@@ -43,7 +43,7 @@ Create screenset-local API service with mocks following HAI3 patterns.
 - [ ] Create mocks
 - [ ] Register mocks in screenset config
 - [ ] Validate: `npm run type-check && npm run arch:check`
-- [ ] Test via Chrome MCP
+- [ ] Test via Chrome DevTools MCP
 ```
 
 ## STEP 2: Wait for Approval
@@ -96,7 +96,7 @@ Call apiRegistry.registerMocks(DOMAIN, mockMap).
 npm run type-check && npm run arch:check
 ```
 
-### 3.5 Test via Chrome MCP
+### 3.5 Test via Chrome DevTools MCP
 STOP: If MCP WebSocket is closed, fix first.
 - Test API calls.
 - Verify mocks return expected data.

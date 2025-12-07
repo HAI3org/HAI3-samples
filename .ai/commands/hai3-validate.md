@@ -23,13 +23,16 @@ REQUIRED: Must pass with zero errors.
 - Hardcoded colors or inline styles.
 - Import violations (package internals, circular dependencies).
 - String literal IDs (must use constants or enums).
+- Inline component definitions in *Screen.tsx files.
+- Inline data arrays (must use API services).
+- @hai3/uicore imports in screensets/*/uikit/ folders.
 
 ## STEP 4: Verify Event-Driven Flow
 - Actions emit events (not dispatch slices).
 - Effects listen to events and update slices.
 - No prop drilling or callback-based state mutation.
 
-## STEP 5: Test via Chrome MCP
+## STEP 5: Test via Chrome DevTools MCP
 STOP: If MCP WebSocket is closed, fix connection first.
 - Exercise all affected flows and screens.
 - Verify UI uses @hai3/uikit and theme tokens.

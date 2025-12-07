@@ -44,3 +44,7 @@ REQUIRED: All checks must pass.
 - Hardcoded colors: BAD style={{ color: '#0066cc' }} -> GOOD className="text-primary"
 - Import violations: BAD import from '@hai3/uikit/src/Foo' -> GOOD import from '@hai3/uikit'
 - String literals: BAD screenId: 'dashboard' -> GOOD export const DASHBOARD_SCREEN_ID = 'dashboard'
+- Inline component: Extract to screens/{screen}/components/ or uikit/ per SCREENSETS.md
+- Inline style: BAD style={{ padding: 10 }} -> GOOD className="p-2"
+- Inline data: Move to api/{domain}/mocks.ts, fetch via event-driven flow
+- UIKit impurity: Move component from uikit/ to components/ if needs @hai3/uicore

@@ -16,6 +16,13 @@
 - App/screensets: REQUIRED import { Button } from '@hai3/uikit'.
 - FORBIDDEN: Raw HTML elements for UI.
 - FORBIDDEN: Manual styling.
+- FORBIDDEN: Inline component definitions in *Screen.tsx.
+
+## Component Placement
+- REQUIRED: Presentational components in screensets/{name}/uikit/.
+- REQUIRED: Shared components in screensets/{name}/components/.
+- REQUIRED: Screen-local components in screens/{screen}/components/.
+- REQUIRED: Screen files orchestrate components only.
 
 ## Registry
 - REQUIRED: export const MY_DOMAIN = 'my-domain'.

@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@hai3/uicore": "^0.1.0-alpha.0",
-    "@hai3/uikit": "^0.1.0-alpha.2",
-    "@hai3/uikit-contracts": "^0.1.0-alpha.0",
+    "@hai3/uikit": "^0.1.0-alpha.3",
+    "@hai3/uikit-contracts": "^0.1.0-alpha.1",
     "@reduxjs/toolkit": "^2.2.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.344.0",
@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@hai3/cli": "^0.1.0-alpha.15",
+    "@hai3/cli": "^0.1.0-alpha.16",
     "@hai3/studio": "^0.1.0-alpha.0",
     "@types/lodash": "^4.17.20",
     "@types/react": "^18.3.3",

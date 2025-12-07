@@ -69,6 +69,14 @@ export const darkTheme: Theme = {
       selected: colors.zinc[700],
       border: colors.zinc[800],
     },
+    // Chart colors for data visualization (OKLCH format, shadcn/ui dark theme)
+    chart: {
+      1: 'oklch(0.488 0.243 264.376)',  // blue
+      2: 'oklch(0.696 0.17 162.48)',    // emerald
+      3: 'oklch(0.769 0.188 70.08)',    // amber
+      4: 'oklch(0.627 0.265 303.9)',    // violet
+      5: 'oklch(0.645 0.246 16.439)',   // rose
+    },
   },
   spacing: {
     xs: '0.25rem',

@@ -69,6 +69,14 @@ export const lightTheme: Theme = {
       selected: colors.blue[50],
       border: colors.zinc[200],
     },
+    // Chart colors for data visualization (OKLCH format, shadcn/ui light theme)
+    chart: {
+      1: 'oklch(0.646 0.222 41.116)',   // warm orange
+      2: 'oklch(0.6 0.118 184.704)',    // teal
+      3: 'oklch(0.398 0.07 227.392)',   // slate blue
+      4: 'oklch(0.828 0.189 84.429)',   // yellow
+      5: 'oklch(0.769 0.188 70.08)',    // amber
+    },
   },
   spacing: {
     xs: '0.25rem',

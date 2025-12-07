@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Switch, Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@hai3/uikit';
+import { Checkbox, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, Textarea } from '@hai3/uikit';
 import { useTranslation, TextLoader } from '@hai3/uicore';
 import { DEMO_SCREENSET_ID } from "../ids";
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../ids";
+import { FormInput } from '../uikit/icons/FormInput';
+import { FormLabel } from '../uikit/icons/FormLabel';
 
 /**
  * Form Elements Component
- * Contains Select and Switch demonstrations
+ * Contains Input, Select and Switch demonstrations
  * Uses parent screen (UIKitElementsScreen) translations
  */
 export const FormElements: React.FC = () => {
@@ -19,6 +21,136 @@ export const FormElements: React.FC = () => {
 
   return (
     <>
+      {/* Checkbox Element Block */}
+      <div data-element-id="element-checkbox" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-28">
+          <h2 className="text-2xl font-semibold">
+            {tk('checkbox_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Basic Checkbox */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('checkbox_basic_label')}
+              </label>
+            </TextLoader>
+            <div className="flex items-center gap-3">
+              <Checkbox id="terms" />
+              <FormLabel htmlFor="terms">{tk('checkbox_terms')}</FormLabel>
+            </div>
+          </div>
+
+          {/* Checkbox with Description */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('checkbox_with_text_label')}
+              </label>
+            </TextLoader>
+            <div className="flex items-start gap-3">
+              <Checkbox id="terms-2" defaultChecked />
+              <div className="grid gap-2">
+                <FormLabel htmlFor="terms-2">{tk('checkbox_terms')}</FormLabel>
+                <p className="text-muted-foreground text-sm">
+                  {tk('checkbox_terms_description')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Disabled Checkbox */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('checkbox_disabled_label')}
+              </label>
+            </TextLoader>
+            <div className="flex items-start gap-3">
+              <Checkbox id="toggle" disabled />
+              <FormLabel htmlFor="toggle">{tk('checkbox_notifications')}</FormLabel>
+            </div>
+          </div>
+
+          {/* Card Style Checkbox */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('checkbox_card_label')}
+              </label>
+            </TextLoader>
+            <label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-primary has-[[aria-checked=true]]:bg-primary/10 max-w-sm cursor-pointer">
+              <Checkbox
+                id="toggle-2"
+                defaultChecked
+              />
+              <div className="grid gap-1.5 font-normal">
+                <p className="text-sm leading-none font-medium">
+                  {tk('checkbox_notifications')}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {tk('checkbox_notifications_description')}
+                </p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Input Element Block */}
+      <div data-element-id="element-input" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-24">
+          <h2 className="text-2xl font-semibold">
+            {tk('input_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Default Input */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_default_label')}
+              </label>
+            </TextLoader>
+            <FormInput type="text" placeholder={tk('input_name_placeholder')} />
+          </div>
+
+          {/* File Input */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_file_label')}
+              </label>
+            </TextLoader>
+            <FormInput id="picture" type="file" />
+          </div>
+
+          {/* Disabled Input */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_disabled_label')}
+              </label>
+            </TextLoader>
+            <FormInput disabled type="email" placeholder={tk('input_email_placeholder')} />
+          </div>
+
+          {/* Input with Label */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_with_label_label')}
+              </label>
+            </TextLoader>
+            <div className="grid w-full max-w-sm items-center gap-3">
+              <FormLabel htmlFor="password-with-label">{tk('input_new_password_label')}</FormLabel>
+              <FormInput type="password" id="password-with-label" placeholder={tk('input_password_placeholder')} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Select Element Block */}
       <div data-element-id="element-select" className="flex flex-col gap-4">
         <TextLoader skeletonClassName="h-8 w-24">
@@ -101,6 +233,36 @@ export const FormElements: React.FC = () => {
               checked={airplaneMode}
               onCheckedChange={setAirplaneMode}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Textarea Element Block */}
+      <div data-element-id="element-textarea" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-24">
+          <h2 className="text-2xl font-semibold">
+            {tk('textarea_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Default Textarea */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('textarea_default_label')}
+              </label>
+            </TextLoader>
+            <Textarea placeholder={tk('textarea_placeholder')} className="max-w-sm" />
+          </div>
+
+          {/* Disabled Textarea */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-24" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('textarea_disabled_label')}
+              </label>
+            </TextLoader>
+            <Textarea disabled placeholder={tk('textarea_placeholder')} className="max-w-sm" />
           </div>
         </div>
       </div>
