@@ -104,8 +104,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             return (
               <ol
                 start={startNum}
-                className="mb-4 space-y-2 ml-6"
-                style={{ listStyleType: 'decimal' }}
+                className="list-decimal mb-4 space-y-2 ml-6"
               >
                 {children}
               </ol>
