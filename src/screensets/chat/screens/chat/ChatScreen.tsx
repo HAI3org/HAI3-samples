@@ -1,30 +1,18 @@
 /**
  * ChatScreen - Main chat interface
- * Implements a full-featured chat UI with threads, messages, and controls
+ * Orchestrates components for a full-featured chat UI
  */
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
-  ChevronLeft,
-  ChevronRight,
-  Send,
-  Copy,
-  Edit3,
-  RotateCcw,
-  ThumbsUp,
-  ThumbsDown,
-  Trash2,
-  User,
-  Bot,
-  Code,
-} from 'lucide-react';
-import {
-  Button,
-  Textarea,
-  Skeleton,
-} from '@hai3/uikit';
-import { ButtonVariant, ButtonSize } from '@hai3/uikit-contracts';
-import { TextLoader, useAppSelector, useAppDispatch, useTranslation, useScreenTranslations, I18nRegistry, Language } from '@hai3/uicore';
+  TextLoader,
+  useAppSelector,
+  useAppDispatch,
+  useTranslation,
+  useScreenTranslations,
+  I18nRegistry,
+  Language,
+} from '@hai3/uicore';
 import * as chatActions from '../../actions/chatActions';
 import { ChatRole } from '../../api/api';
 import type { AttachedFile } from '../../types';
@@ -33,20 +21,10 @@ import { selectMessagesState } from '../../slices/messagesSlice';
 import { selectComposerState } from '../../slices/composerSlice';
 import { selectSettingsState } from '../../slices/settingsSlice';
 import { CHAT_SCREENSET_ID, CHAT_SCREEN_ID } from '../../ids';
-import { ModelSelector } from '../../uikit/components/ModelSelector';
-import { TemporaryChatToggle } from '../../uikit/components/TemporaryChatToggle';
-import { ChatTitleEditor } from '../../uikit/components/ChatTitleEditor';
 import { EnhancedThreadList, type EnhancedChatThread } from '../../uikit/components/EnhancedThreadList';
-import {
-  ContextSelector,
-  SelectedContextsDisplay,
-} from '../../uikit/components/ContextSelector';
-import {
-  FileAttachmentButton,
-  FileAttachmentPreview,
-  MessageFileDisplay,
-} from '../../uikit/components/FileAttachment';
-import { MarkdownRenderer } from '../../uikit/components/MarkdownRenderer';
+import { ChatHeader } from './components/ChatHeader';
+import { MessageList } from './components/MessageList';
+import { ChatInputArea } from './components/ChatInputArea';
 
 /**
  * Chat screen translations (loaded lazily when screen mounts)
@@ -90,8 +68,11 @@ const translations = I18nRegistry.createLoader({
   [Language.ChineseTraditional]: () => import('./i18n/zh-TW.json'),
 });
 
-const ChatScreenInternal: React.FC = () => {
-  // Register translations for this screen
+/**
+ * ChatScreen - Main chat interface
+ * Uses global Redux store (accessed via HAI3Provider in main.tsx)
+ */
+export const ChatScreen: React.FC = () => {
   useScreenTranslations(CHAT_SCREENSET_ID, CHAT_SCREEN_ID, translations);
 
   const dispatch = useAppDispatch();
@@ -102,66 +83,49 @@ const ChatScreenInternal: React.FC = () => {
   useEffect(() => {
     void dispatch(chatActions.fetchChatData());
   }, [dispatch]);
-  
+
+  // Local UI state
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [hoveredMessage, setHoveredMessage] = useState<string | null>(null);
   const [isContextSelectorOpen, setIsContextSelectorOpen] = useState(false);
   const [isTitleEditing, setIsTitleEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
 
-  // Subscribe to Redux state from global uicore store
-  // Domain slices were dynamically registered and RootState augmented in each slice
+  // Refs
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Redux state
   const threadsState = useAppSelector(selectThreadsState);
   const messagesState = useAppSelector(selectMessagesState);
   const composerState = useAppSelector(selectComposerState);
   const settingsState = useAppSelector(selectSettingsState);
 
-  // Destructure state from domain slices
   const { threads, currentThreadId } = threadsState;
   const { messages, isStreaming, editingMessageId, editedContent } = messagesState;
   const { inputValue, attachedFiles } = composerState;
   const { currentModel, currentContext, availableContexts } = settingsState;
 
-  // Get messages for current thread
+  // Derived state
   const currentMessages = messages.filter((m) => m.threadId === currentThreadId);
-
-  // Auto-scroll to bottom when new messages arrive or thread changes
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentMessages.length, currentThreadId]);
-
-  // SSE connection cleanup (TODO: track connection IDs in Redux for proper cleanup)
-  useEffect(() => {
-    return () => {
-      // When implementing proper connection tracking:
-      // const chatApi = apiRegistry.getService(CHAT_DOMAIN);
-      // if (activeConnectionId) {
-      //   chatApi.disconnectStream(activeConnectionId);
-      // }
-      // Note: SseProtocol.cleanup() will close all connections when service is destroyed
-    };
-  }, []);
-
-  // Get current thread
   const currentThread = useMemo(
     () => threads.find((t) => t.id === currentThreadId) || { isTemporary: false, title: 'New Chat' },
     [threads, currentThreadId]
   );
 
-  // Handlers
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentMessages.length, currentThreadId]);
+
+  // Thread handlers
   const handleThreadSelect = useCallback((threadId: string) => {
     chatActions.selectThread(threadId);
   }, []);
 
   const handleNewThread = useCallback(() => {
     const isTemporary = currentThread?.isTemporary || false;
-    // Get localized "New chat" title
     const newChatTitle = t(`screenset.${CHAT_SCREENSET_ID}:new_chat`);
-    // Create draft thread locally (no API call yet)
-    // Thread will be created on backend when user sends first message
     chatActions.createDraftThread(newChatTitle, isTemporary);
   }, [currentThread, t]);
 
@@ -169,46 +133,15 @@ const ChatScreenInternal: React.FC = () => {
     void dispatch(chatActions.deleteThread(threadId));
   }, [dispatch]);
 
-  const handleSendMessage = useCallback(() => {
-    if (!isStreaming && (inputValue.trim() || attachedFiles.length > 0) && currentThreadId) {
-      // Build conversation messages for API request
-      const conversationMessages = messages
-        .filter((m) => m.threadId === currentThreadId)
-        .map((m) => ({
-          role: m.type === 'user' ? ChatRole.User : ChatRole.Assistant,
-          content: m.content,
-        }));
+  const handleThreadTitleEdit = useCallback((threadId: string, newTitle: string) => {
+    void dispatch(chatActions.updateThreadTitle(threadId, newTitle));
+  }, [dispatch]);
 
-      const isTemporary = currentThread?.isTemporary || false;
-      void dispatch(chatActions.sendMessage(inputValue, currentThreadId, currentModel, conversationMessages, isTemporary));
-    }
-  }, [dispatch, inputValue, isStreaming, attachedFiles.length, currentThreadId, currentModel, messages, currentThread]);
-
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    chatActions.changeInputValue(value);
+  const handleThreadReorder = useCallback((newThreads: EnhancedChatThread[]) => {
+    chatActions.reorderThreads(newThreads);
   }, []);
 
-  const handleModelChange = useCallback((model: string) => {
-    chatActions.changeModel(model);
-  }, []);
-
-  const handleAddContext = useCallback((contextId: string) => {
-    chatActions.addContext(contextId);
-  }, []);
-
-  const handleRemoveContext = useCallback((contextId: string) => {
-    chatActions.removeContext(contextId);
-  }, []);
-
-  const handleFileSelect = useCallback((file: AttachedFile) => {
-    chatActions.attachFile(file);
-  }, []);
-
-  const handleFileRemove = useCallback((fileId: string) => {
-    chatActions.removeFile(fileId);
-  }, []);
-
+  // Header handlers
   const handleTitleEditStart = useCallback(() => {
     if (currentThread) {
       setIsTitleEditing(true);
@@ -216,57 +149,26 @@ const ChatScreenInternal: React.FC = () => {
     }
   }, [currentThread]);
 
-  const handleTitleSave = useCallback((newTitle: string) => {
-    if (currentThreadId && newTitle.trim()) {
-      void dispatch(chatActions.updateThreadTitle(currentThreadId, newTitle.trim()));
+  const handleTitleSave = useCallback(() => {
+    if (currentThreadId && editedTitle.trim()) {
+      void dispatch(chatActions.updateThreadTitle(currentThreadId, editedTitle.trim()));
     }
     setIsTitleEditing(false);
     setEditedTitle('');
-  }, [currentThreadId, dispatch]);
+  }, [currentThreadId, editedTitle, dispatch]);
 
   const handleTitleCancel = useCallback(() => {
     setIsTitleEditing(false);
     setEditedTitle('');
   }, []);
 
-  const handleThreadTitleEdit = useCallback((threadId: string, newTitle: string) => {
-    void dispatch(chatActions.updateThreadTitle(threadId, newTitle));
-  }, [dispatch]);
-
-  const handleTemporaryToggle = useCallback((isTemporary: boolean) => {
-    if (currentThreadId) {
-      chatActions.toggleThreadTemporary(currentThreadId, isTemporary);
-    }
-  }, [currentThreadId]);
-
-  const handleThreadReorder = useCallback((newThreads: EnhancedChatThread[]) => {
-    chatActions.reorderThreads(newThreads);
-  }, []);
-
-  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (!isStreaming && (inputValue.trim() || attachedFiles.length > 0) && currentThreadId) {
-        // Build conversation messages for API request
-        const conversationMessages = messages
-          .filter((m) => m.threadId === currentThreadId)
-          .map((m) => ({
-            role: m.type === 'user' ? ChatRole.User : ChatRole.Assistant,
-            content: m.content,
-          }));
-
-        const isTemporary = currentThread?.isTemporary || false;
-        void dispatch(chatActions.sendMessage(inputValue, currentThreadId, currentModel, conversationMessages, isTemporary));
-      }
-    }
-  }, [dispatch, isStreaming, inputValue, attachedFiles.length, currentThreadId, currentModel, messages, currentThread]);
-
+  // Message handlers
   const handleCopyMessage = useCallback((content: string) => {
     navigator.clipboard.writeText(content);
   }, []);
 
   const handleEditMessage = useCallback((messageId: string) => {
-    const message = currentMessages.find(m => m.id === messageId);
+    const message = currentMessages.find((m) => m.id === messageId);
     if (message) {
       chatActions.startEditingMessage(messageId, message.content);
     }
@@ -286,6 +188,10 @@ const ChatScreenInternal: React.FC = () => {
     chatActions.cancelEditingMessage();
   }, []);
 
+  const handleToggleViewMode = useCallback((messageId: string) => {
+    chatActions.toggleMessageViewMode(messageId);
+  }, []);
+
   const handleLikeMessage = useCallback((messageId: string) => {
     chatActions.likeMessage(messageId);
   }, []);
@@ -295,19 +201,14 @@ const ChatScreenInternal: React.FC = () => {
   }, []);
 
   const handleRegenerateMessage = useCallback((messageId: string) => {
-    // Find the message being regenerated
-    const messageIndex = currentMessages.findIndex(m => m.id === messageId);
+    const messageIndex = currentMessages.findIndex((m) => m.id === messageId);
     if (messageIndex === -1) return;
 
     const message = currentMessages[messageIndex];
-
-    // Build conversation history up to (but not including) the message being regenerated
-    const conversationMessages = currentMessages
-      .slice(0, messageIndex)
-      .map(m => ({
-        role: m.type === 'user' ? ChatRole.User : ChatRole.Assistant,
-        content: m.content,
-      }));
+    const conversationMessages = currentMessages.slice(0, messageIndex).map((m) => ({
+      role: m.type === 'user' ? ChatRole.User : ChatRole.Assistant,
+      content: m.content,
+    }));
 
     void dispatch(chatActions.regenerateMessage(messageId, message.threadId, currentModel, conversationMessages));
   }, [currentMessages, currentModel, dispatch]);
@@ -316,8 +217,59 @@ const ChatScreenInternal: React.FC = () => {
     chatActions.deleteMessage(messageId);
   }, []);
 
-  const handleToggleViewMode = useCallback((messageId: string) => {
-    chatActions.toggleMessageViewMode(messageId);
+  // Input handlers
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    chatActions.changeInputValue(e.target.value);
+  }, []);
+
+  const handleSendMessage = useCallback(() => {
+    if (!isStreaming && (inputValue.trim() || attachedFiles.length > 0) && currentThreadId) {
+      const conversationMessages = messages
+        .filter((m) => m.threadId === currentThreadId)
+        .map((m) => ({
+          role: m.type === 'user' ? ChatRole.User : ChatRole.Assistant,
+          content: m.content,
+        }));
+
+      const isTemporary = currentThread?.isTemporary || false;
+      void dispatch(chatActions.sendMessage(inputValue, currentThreadId, currentModel, conversationMessages, isTemporary));
+    }
+  }, [dispatch, inputValue, isStreaming, attachedFiles.length, currentThreadId, currentModel, messages, currentThread]);
+
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    },
+    [handleSendMessage]
+  );
+
+  const handleModelChange = useCallback((model: string) => {
+    chatActions.changeModel(model);
+  }, []);
+
+  const handleTemporaryToggle = useCallback((isTemporary: boolean) => {
+    if (currentThreadId) {
+      chatActions.toggleThreadTemporary(currentThreadId, isTemporary);
+    }
+  }, [currentThreadId]);
+
+  const handleAddContext = useCallback((contextId: string) => {
+    chatActions.addContext(contextId);
+  }, []);
+
+  const handleRemoveContext = useCallback((contextId: string) => {
+    chatActions.removeContext(contextId);
+  }, []);
+
+  const handleFileSelect = useCallback((file: AttachedFile) => {
+    chatActions.attachFile(file);
+  }, []);
+
+  const handleFileRemove = useCallback((fileId: string) => {
+    chatActions.removeFile(fileId);
   }, []);
 
   return (
@@ -366,325 +318,117 @@ const ChatScreenInternal: React.FC = () => {
 
       {/* Main chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header with collapse button and editable title */}
-        <div className="border-b border-border px-4 py-3 flex items-center gap-4 bg-card">
-          <Button
-            variant={ButtonVariant.Ghost}
-            size={ButtonSize.Icon}
-            onClick={() => setIsMenuCollapsed(!isMenuCollapsed)}
-            aria-label={isMenuCollapsed ? tk('expand_menu') : tk('collapse_menu')}
-            className="[&_svg]:size-5"
-          >
-            {isMenuCollapsed ? <ChevronRight /> : <ChevronLeft />}
-          </Button>
-          <div className="flex-1 min-w-0">
-            {currentThread && (
-              <ChatTitleEditor
-                title={currentThread.title}
-                isEditing={isTitleEditing}
-                editedTitle={editedTitle}
-                onEditStart={handleTitleEditStart}
-                onTitleChange={setEditedTitle}
-                onSave={() => handleTitleSave(editedTitle)}
-                onCancel={handleTitleCancel}
-                editLabel={tk('edit_title')}
-                saveLabel={tk('save')}
-                cancelLabel={tk('cancel')}
-                placeholderLabel={tk('click_to_edit_title')}
-              />
-            )}
-          </div>
-        </div>
+        <ChatHeader
+          isMenuCollapsed={isMenuCollapsed}
+          onToggleMenu={() => setIsMenuCollapsed(!isMenuCollapsed)}
+          title={currentThread.title}
+          isEditing={isTitleEditing}
+          editedTitle={editedTitle}
+          onEditStart={handleTitleEditStart}
+          onTitleChange={setEditedTitle}
+          onSave={handleTitleSave}
+          onCancel={handleTitleCancel}
+          expandMenuLabel={tk('expand_menu')}
+          collapseMenuLabel={tk('collapse_menu')}
+          editLabel={tk('edit_title')}
+          saveLabel={tk('save')}
+          cancelLabel={tk('cancel')}
+          placeholderLabel={tk('click_to_edit_title')}
+        />
 
-        {/* Messages area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-muted">
-          {currentMessages.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-muted-foreground">
-                <TextLoader skeletonClassName="h-7 w-48 mx-auto mb-2">
-                  <p className="text-lg mb-2">{tk('no_messages')}</p>
-                </TextLoader>
-                <TextLoader skeletonClassName="h-5 w-96 mx-auto">
-                  <p className="text-sm">{tk('no_messages_description')}</p>
-                </TextLoader>
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-3xl mx-auto">
-              {currentMessages.map((message) => (
-                <div
-                  key={message.id}
-                  className="mb-8 group"
-                  onMouseEnter={() => setHoveredMessage(message.id)}
-                  onMouseLeave={() => setHoveredMessage(null)}
-                >
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center [&_svg]:size-4 ${
-                          message.type === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-secondary text-secondary-foreground'
-                        }`}
-                      >
-                        {message.type === 'user' ? <User /> : <Bot />}
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      {editingMessageId === message.id ? (
-                        <div className="space-y-3">
-                          <Textarea
-                            ref={editTextareaRef}
-                            value={editedContent}
-                            onChange={handleEditedContentChange}
-                            autoResize
-                            minHeight={50}
-                            maxHeight={350}
-                            className="w-full resize-none overflow-y-auto leading-normal"
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={handleSaveEdit}
-                              className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded hover:bg-primary/90 transition-colors"
-                            >
-                              <TextLoader skeletonClassName="h-4 w-12" inheritColor>
-                                {tk('save')}
-                              </TextLoader>
-                            </button>
-                            <button
-                              onClick={handleCancelEdit}
-                              className="px-3 py-1 bg-secondary text-secondary-foreground text-sm rounded hover:bg-secondary/90 transition-colors"
-                            >
-                              <TextLoader skeletonClassName="h-4 w-14" inheritColor>
-                                {tk('cancel')}
-                              </TextLoader>
-                            </button>
-                          </div>
-                        </div>
-                      ) : message.content === '' && isStreaming ? (
-                        <Skeleton className="h-6 w-32" />
-                      ) : (
-                        <>
-                          {message.showRawMarkdown ? (
-                            <pre className="whitespace-pre-wrap font-mono text-sm bg-muted p-3 rounded-lg">
-                              {message.content}
-                            </pre>
-                          ) : (
-                            <MarkdownRenderer content={message.content} />
-                          )}
-                          {message.files && <MessageFileDisplay files={message.files} />}
-                        </>
-                      )}
+        <MessageList
+          ref={messagesEndRef}
+          messages={currentMessages}
+          editingMessageId={editingMessageId}
+          editedContent={editedContent}
+          isStreaming={isStreaming}
+          hoveredMessageId={hoveredMessage}
+          onMessageHover={setHoveredMessage}
+          onCopyMessage={handleCopyMessage}
+          onEditMessage={handleEditMessage}
+          onEditedContentChange={handleEditedContentChange}
+          onSaveEdit={handleSaveEdit}
+          onCancelEdit={handleCancelEdit}
+          onToggleViewMode={handleToggleViewMode}
+          onLikeMessage={handleLikeMessage}
+          onDislikeMessage={handleDislikeMessage}
+          onRegenerateMessage={handleRegenerateMessage}
+          onDeleteMessage={handleDeleteMessage}
+          labels={{
+            noMessages: tk('no_messages'),
+            noMessagesDescription: tk('no_messages_description'),
+            save: tk('save'),
+            cancel: tk('cancel'),
+            copyMessage: tk('copy_message'),
+            showMarkdownView: tk('show_markdown_view'),
+            showRawMarkdown: tk('show_raw_markdown'),
+            editMessage: tk('edit_message'),
+            regenerateResponse: tk('regenerate_response'),
+            likeMessage: tk('like_message'),
+            dislikeMessage: tk('dislike_message'),
+            deleteMessage: tk('delete_message'),
+          }}
+        />
 
-                      {/* Message Actions */}
-                      {editingMessageId !== message.id && (
-                        <div className="flex items-center gap-1 mt-2">
-                        {/* Always visible copy button */}
-                        <button
-                          onClick={() => handleCopyMessage(message.content)}
-                          className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground [&_svg]:size-3.5"
-                          title={tk('copy_message')}
-                        >
-                          <Copy />
-                        </button>
-
-                        {/* Additional buttons visible on hover or when liked/disliked/raw view */}
-                        <div
-                          className={`flex items-center gap-1 transition-opacity duration-200 ${
-                            hoveredMessage === message.id || message.liked || message.disliked || message.showRawMarkdown ? 'opacity-100' : 'opacity-0'
-                          }`}
-                        >
-                          <button
-                            onClick={() => handleToggleViewMode(message.id)}
-                            className={`p-1.5 hover:bg-muted rounded-lg transition-colors [&_svg]:size-3.5 ${
-                              message.showRawMarkdown
-                                ? 'bg-muted text-foreground'
-                                : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                            title={message.showRawMarkdown ? tk('show_markdown_view') : tk('show_raw_markdown')}
-                          >
-                            <Code />
-                          </button>
-                          <button
-                            onClick={() => handleEditMessage(message.id)}
-                            className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground [&_svg]:size-3.5"
-                            title={tk('edit_message')}
-                          >
-                            <Edit3 />
-                          </button>
-                          {message.type === 'assistant' && (
-                            <button
-                              onClick={() => handleRegenerateMessage(message.id)}
-                              className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground [&_svg]:size-3.5"
-                              title={tk('regenerate_response')}
-                            >
-                              <RotateCcw />
-                            </button>
-                          )}
-                          {message.type === 'assistant' && (
-                            <>
-                              <button
-                                onClick={() => handleLikeMessage(message.id)}
-                                className={`p-1.5 hover:bg-muted rounded-lg transition-colors [&_svg]:size-3.5 ${
-                                  message.liked
-                                    ? 'text-green-600 dark:text-green-500'
-                                    : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                                title={tk('like_message')}
-                              >
-                                <ThumbsUp 
-                                  fill={message.liked ? 'currentColor' : 'none'}
-                                />
-                              </button>
-                              <button
-                                onClick={() => handleDislikeMessage(message.id)}
-                                className={`p-1.5 hover:bg-muted rounded-lg transition-colors [&_svg]:size-3.5 ${
-                                  message.disliked
-                                    ? 'text-red-600 dark:text-red-500'
-                                    : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                                title={tk('dislike_message')}
-                              >
-                                <ThumbsDown 
-                                  fill={message.disliked ? 'currentColor' : 'none'}
-                                />
-                              </button>
-                            </>
-                          )}
-                          <button
-                            onClick={() => handleDeleteMessage(message.id)}
-                            className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-destructive [&_svg]:size-3.5"
-                            title={tk('delete_message')}
-                          >
-                            <Trash2 />
-                          </button>
-                        </div>
-                      </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-        </div>
-
-        {/* Input area with controls */}
-        <div className="border-t border-border bg-card px-4 py-3">
-          <div className="max-w-3xl mx-auto space-y-3">
-            {/* Model and temporary chat toggle */}
-            <div className="flex items-center gap-3">
-              <ModelSelector
-                value={currentModel}
-                onChange={handleModelChange}
-                placeholder={tk('select_model')}
-                disabled={isStreaming}
-              >
-                <TextLoader skeletonClassName="h-4 w-12" inheritColor>
-                  {tk('model_label')}
-                </TextLoader>
-              </ModelSelector>
-              <TemporaryChatToggle
-                value={currentThread?.isTemporary || false}
-                onChange={handleTemporaryToggle}
-                disabled={isStreaming}
-              >
-                <TextLoader skeletonClassName="h-4 w-28" inheritColor>
-                  {tk('temporary_chat')}
-                </TextLoader>
-              </TemporaryChatToggle>
-            </div>
-
-            {/* Selected contexts display */}
-            {currentContext.length > 0 && (
-              <SelectedContextsDisplay
-                availableContexts={availableContexts}
-                selectedContexts={currentContext}
-                onRemove={handleRemoveContext}
-                removeAriaLabelFormatter={(name) => `Remove ${name}`}
-              >
-                <TextLoader skeletonClassName="h-4 w-16" inheritColor>
-                  {tk('context_label')}
-                </TextLoader>
-              </SelectedContextsDisplay>
-            )}
-
-            {/* File attachments preview */}
-            <FileAttachmentPreview
-              files={attachedFiles}
-              onRemove={handleFileRemove}
-              removeLabel={tk('remove_file')}
-            />
-
-            {/* Message input */}
-            <div className="flex gap-2 items-end">
-              <div className="flex-1 relative">
-                <Textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyPress}
-                  placeholder={translationsReady ? tk('message_placeholder') : undefined}
-                  disabled={isStreaming}
-                  size="sm"
-                  autoResize
-                  className="w-full pe-20 rounded-lg resize-none overflow-y-auto"
-                />
-                <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <ContextSelector
-                    availableContexts={availableContexts}
-                    selectedContexts={currentContext}
-                    isOpen={isContextSelectorOpen}
-                    onToggleOpen={() => setIsContextSelectorOpen(!isContextSelectorOpen)}
-                    onAdd={handleAddContext}
-                    onRemove={handleRemoveContext}
-                    placeholderLabel={
-                      <TextLoader skeletonClassName="h-4 w-20" inheritColor>
-                        {tk('add_context')}
-                      </TextLoader>
-                    }
-                    selectContextLabel={
-                      <TextLoader skeletonClassName="h-4 w-24">
-                        {tk('select_context')}
-                      </TextLoader>
-                    }
-                    disabled={isStreaming}
-                  />
-                  <FileAttachmentButton
-                    onFileSelect={handleFileSelect}
-                    disabled={isStreaming}
-                    attachLabel={tk('attach_file')}
-                  />
-                </div>
-              </div>
-              <Button
-                variant={ButtonVariant.Default}
-                onClick={handleSendMessage}
-                disabled={isStreaming || (!inputValue.trim() && attachedFiles.length === 0)}
-                className="h-11 px-4 rounded-lg [&_svg]:size-5"
-                aria-label={tk('send_message')}
-              >
-                <Send />
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ChatInputArea
+          ref={inputRef}
+          inputValue={inputValue}
+          currentModel={currentModel}
+          isTemporary={currentThread?.isTemporary || false}
+          isStreaming={isStreaming}
+          attachedFiles={attachedFiles}
+          availableContexts={availableContexts}
+          selectedContexts={currentContext}
+          isContextSelectorOpen={isContextSelectorOpen}
+          translationsReady={translationsReady}
+          onInputChange={handleInputChange}
+          onKeyDown={handleKeyPress}
+          onSendMessage={handleSendMessage}
+          onModelChange={handleModelChange}
+          onTemporaryToggle={handleTemporaryToggle}
+          onToggleContextSelector={() => setIsContextSelectorOpen(!isContextSelectorOpen)}
+          onAddContext={handleAddContext}
+          onRemoveContext={handleRemoveContext}
+          onFileSelect={handleFileSelect}
+          onFileRemove={handleFileRemove}
+          labels={{
+            modelLabel: (
+              <TextLoader skeletonClassName="h-4 w-12" inheritColor>
+                {tk('model_label')}
+              </TextLoader>
+            ),
+            selectModel: tk('select_model'),
+            temporaryChat: (
+              <TextLoader skeletonClassName="h-4 w-28" inheritColor>
+                {tk('temporary_chat')}
+              </TextLoader>
+            ),
+            contextLabel: (
+              <TextLoader skeletonClassName="h-4 w-16" inheritColor>
+                {tk('context_label')}
+              </TextLoader>
+            ),
+            addContext: (
+              <TextLoader skeletonClassName="h-4 w-20" inheritColor>
+                {tk('add_context')}
+              </TextLoader>
+            ),
+            selectContext: (
+              <TextLoader skeletonClassName="h-4 w-24">
+                {tk('select_context')}
+              </TextLoader>
+            ),
+            removeFile: tk('remove_file'),
+            attachFile: tk('attach_file'),
+            messagePlaceholder: translationsReady ? tk('message_placeholder') : undefined,
+            sendMessage: tk('send_message'),
+          }}
+        />
       </div>
     </div>
   );
 };
 
-/**
- * ChatScreen - Main chat interface
- * Uses global Redux store (accessed via HAI3Provider in main.tsx)
- * Chat slice is registered in chatStore.ts
- */
-export const ChatScreen: React.FC = ChatScreenInternal;
-
 ChatScreen.displayName = 'ChatScreen';
 
-// Default export for lazy loading
 export default ChatScreen;
