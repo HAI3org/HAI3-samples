@@ -17,8 +17,8 @@
     "arch:deps": "npx dependency-cruiser src/ --config .dependency-cruiser.cjs --output-type err-long"
   },
   "dependencies": {
-    "@hai3/uicore": "^0.1.0-alpha.0",
-    "@hai3/uikit": "^0.1.0-alpha.3",
+    "@hai3/uicore": "^0.1.0-alpha.1",
+    "@hai3/uikit": "^0.1.0-alpha.5",
     "@hai3/uikit-contracts": "^0.1.0-alpha.1",
     "@reduxjs/toolkit": "^2.2.1",
     "lodash": "^4.17.21",
@@ -31,8 +31,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@hai3/cli": "^0.1.0-alpha.17",
-    "@hai3/studio": "^0.1.0-alpha.0",
+    "@hai3/cli": "^0.1.0-alpha.18",
+    "@hai3/studio": "^0.1.0-alpha.1",
     "@types/lodash": "^4.17.20",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
