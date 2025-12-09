@@ -1,7 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@hai3/uikit';
-import { useMemo, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, AreaChart, Area, ResponsiveContainer, ChartContainer, ChartTooltip, ChartTooltipContent } from '@hai3/uikit';
+import { useMemo } from 'react';
 import { ProgressBar } from '../../../uikit/base/ProgressBar';
-import { PositionedTooltip } from '../../../uikit/base/PositionedTooltip';
 
 interface MetricCardProps {
   title: string;
@@ -21,22 +20,13 @@ const colorClasses = {
   indigo: 'bg-indigo-500',
 };
 
-const strokeColors = {
-  blue: 'hsl(var(--chart-1))',
-  purple: 'hsl(var(--chart-2))',
-  orange: 'hsl(var(--chart-3))',
-  green: 'hsl(var(--chart-4))',
-  cyan: 'hsl(var(--chart-5))',
-  indigo: 'hsl(var(--chart-1))',
-};
-
-const fillColors = {
-  blue: 'hsl(var(--chart-1) / 0.1)',
-  purple: 'hsl(var(--chart-2) / 0.1)',
-  orange: 'hsl(var(--chart-3) / 0.1)',
-  green: 'hsl(var(--chart-4) / 0.1)',
-  cyan: 'hsl(var(--chart-5) / 0.1)',
-  indigo: 'hsl(var(--chart-1) / 0.1)',
+const colorToChartVar: Record<string, string> = {
+  blue: '--chart-1',
+  purple: '--chart-2',
+  orange: '--chart-3',
+  green: '--chart-4',
+  cyan: '--chart-5',
+  indigo: '--chart-1',
 };
 
 const iconPaths = {
@@ -47,32 +37,28 @@ const iconPaths = {
   network: 'M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z',
 };
 
+/**
+ * Get chart color from CSS variables (theme-aware)
+ */
+const getChartColor = (colorName: string): string => {
+  const cssVar = colorToChartVar[colorName] || '--chart-1';
+  const styles = getComputedStyle(document.documentElement);
+  return styles.getPropertyValue(cssVar).trim();
+};
+
 export function MetricCard({ title, value, unit, icon, color, history = [] }: MetricCardProps) {
   const percentage = unit === '%' ? value : null;
   const displayValue = percentage !== null ? percentage.toFixed(1) : value.toFixed(1);
-  const [tooltip, setTooltip] = useState<{ x: number; y: number; value: number; index: number } | null>(null);
 
-  const chartPath = useMemo(() => {
+  // Transform history data for recharts
+  const chartData = useMemo(() => {
     if (history.length < 2) return null;
-
-    const width = 100;
-    const height = 40;
-    const maxValue = Math.max(...history, value);
-    const minValue = Math.min(...history, value);
-    const range = maxValue - minValue || 1;
-    const xStep = width / (history.length - 1);
-
-    const points = history.map((val, index) => {
-      const x = index * xStep;
-      const y = height - ((val - minValue) / range) * height;
-      return { x, y, value: val, index };
-    });
-
-    const linePath = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
-    const areaPath = `${linePath} L ${width},${height} L 0,${height} Z`;
-
-    return { linePath, areaPath, points, maxValue, minValue, range };
-  }, [history, value]);
+    return history.map((val, index) => ({
+      index,
+      value: val,
+      daysAgo: history.length - index,
+    }));
+  }, [history]);
 
   const trend = useMemo(() => {
     if (history.length < 2) return null;
@@ -84,6 +70,9 @@ export function MetricCard({ title, value, unit, icon, color, history = [] }: Me
       percentage: Math.abs((diff / avg) * 100),
     };
   }, [history, value]);
+
+  // Get theme-aware chart color
+  const chartColor = useMemo(() => getChartColor(color), [color]);
 
   return (
     <Card>
@@ -130,65 +119,23 @@ export function MetricCard({ title, value, unit, icon, color, history = [] }: Me
           )}
         </div>
 
-        {chartPath && (
-          <div
-            className="mt-3 h-16 relative group"
-            onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = ((e.clientX - rect.left) / rect.width) * 100;
-              const closestPoint = chartPath.points.reduce((prev, curr) =>
-                Math.abs(curr.x - x) < Math.abs(prev.x - x) ? curr : prev
-              );
-              setTooltip(closestPoint);
-            }}
-            onMouseLeave={() => setTooltip(null)}
-          >
-            <svg
-              viewBox="0 0 100 40"
-              preserveAspectRatio="none"
-              className="w-full h-full"
-            >
-              <path
-                d={chartPath.areaPath}
-                fill={fillColors[color]}
-              />
-              <path
-                d={chartPath.linePath}
-                fill="none"
-                stroke={strokeColors[color]}
-                strokeWidth="1"
-                vectorEffect="non-scaling-stroke"
-              />
-              {tooltip && (
-                <>
-                  <line
-                    x1={tooltip.x}
-                    y1="0"
-                    x2={tooltip.x}
-                    y2="40"
-                    stroke={strokeColors[color]}
-                    strokeWidth="0.5"
-                    strokeDasharray="2,2"
-                    vectorEffect="non-scaling-stroke"
+        {chartData && (
+          <div className="mt-3 h-16">
+            <ChartContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke={chartColor}
+                    fill={chartColor}
+                    fillOpacity={0.1}
+                    strokeWidth={2}
                   />
-                  <circle
-                    cx={tooltip.x}
-                    cy={tooltip.y}
-                    r="1.5"
-                    fill={strokeColors[color]}
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </>
-              )}
-            </svg>
-            {tooltip && (
-              <PositionedTooltip leftPercent={tooltip.x}>
-                <div className="font-semibold">{tooltip.value.toFixed(1)} {unit}</div>
-                <div className="text-muted-foreground text-[10px]">
-                  {history.length - tooltip.index} {history.length - tooltip.index === 1 ? 'day ago' : 'days ago'}
-                </div>
-              </PositionedTooltip>
-            )}
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </div>
         )}
 

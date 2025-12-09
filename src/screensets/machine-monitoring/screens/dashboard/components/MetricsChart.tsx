@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@hai3/uikit';
+import { Card, CardContent, CardHeader, CardTitle, LineChart, Line, XAxis, YAxis, ResponsiveContainer, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@hai3/uikit';
 import type { MetricsSnapshot } from '../../../api/mockData';
 import { useMemo } from 'react';
 import { sortBy } from 'lodash';
@@ -8,53 +8,36 @@ interface MetricsChartProps {
   tk: (key: string) => string;
 }
 
+/**
+ * Get chart colors from CSS variables (theme-aware)
+ */
+const getChartColors = (): string[] => {
+  const styles = getComputedStyle(document.documentElement);
+  return [
+    styles.getPropertyValue('--chart-1').trim(),
+    styles.getPropertyValue('--chart-2').trim(),
+    styles.getPropertyValue('--chart-3').trim(),
+    styles.getPropertyValue('--chart-4').trim(),
+  ];
+};
+
 export function MetricsChart({ metrics, tk }: MetricsChartProps) {
   const sortedMetrics = useMemo(() => sortBy(metrics, 'timestamp'), [metrics]);
 
+  // Transform data for recharts
   const chartData = useMemo(() => {
-    if (sortedMetrics.length === 0) return { points: [], maxValue: 100 };
-
-    const maxValue = Math.max(
-      ...sortedMetrics.map(m => Math.max(m.cpuUsage, m.ramUsage, m.diskUsage, m.gpuUsage))
-    );
-
-    return {
-      points: sortedMetrics,
-      maxValue: Math.ceil(maxValue / 10) * 10,
-    };
+    return sortedMetrics.map(m => ({
+      timestamp: m.timestamp,
+      date: new Date(m.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+      CPU: m.cpuUsage,
+      RAM: m.ramUsage,
+      Disk: m.diskUsage,
+      GPU: m.gpuUsage,
+    }));
   }, [sortedMetrics]);
 
-  const createPath = (dataKey: keyof MetricsSnapshot, color: string) => {
-    if (chartData.points.length === 0) return null;
-
-    const width = 100;
-    const height = 60;
-    const xStep = width / (chartData.points.length - 1 || 1);
-
-    const points = chartData.points.map((point, index) => {
-      const x = index * xStep;
-      const value = point[dataKey] as number;
-      const y = height - (value / chartData.maxValue) * height;
-      return `${x},${y}`;
-    });
-
-    return (
-      <polyline
-        points={points.join(' ')}
-        fill="none"
-        stroke={color}
-        strokeWidth="0.5"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-  };
-
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  };
-
-  const latestMetrics = sortedMetrics[sortedMetrics.length - 1];
+  // Get theme-aware chart colors
+  const chartColors = useMemo(() => getChartColors(), []);
 
   return (
     <Card className="h-full">
@@ -64,66 +47,33 @@ export function MetricsChart({ metrics, tk }: MetricsChartProps) {
       <CardContent>
         <div className="space-y-4">
           {/* Chart */}
-          <div className="relative w-full h-48 bg-muted/30 rounded-lg p-4">
-            <svg
-              viewBox="0 0 100 60"
-              preserveAspectRatio="none"
-              className="w-full h-full"
-            >
-              {createPath('cpuUsage', 'hsl(var(--chart-1))')}
-              {createPath('ramUsage', 'hsl(var(--chart-2))')}
-              {createPath('diskUsage', 'hsl(var(--chart-3))')}
-              {createPath('gpuUsage', 'hsl(var(--chart-4))')}
-            </svg>
+          <div className="w-full h-48">
+            <ChartContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[0, 100]}
+                    tickFormatter={(yValue) => `${yValue}%`}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Line type="monotone" dataKey="CPU" stroke={chartColors[0]} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="RAM" stroke={chartColors[1]} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="Disk" stroke={chartColors[2]} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="GPU" stroke={chartColors[3]} strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </div>
-
-          {/* Legend and Current Values */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
-              <div className="text-sm">
-                <span className="font-medium">CPU:</span>{' '}
-                <span className="text-muted-foreground">
-                  {latestMetrics?.cpuUsage.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-500" />
-              <div className="text-sm">
-                <span className="font-medium">RAM:</span>{' '}
-                <span className="text-muted-foreground">
-                  {latestMetrics?.ramUsage.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
-              <div className="text-sm">
-                <span className="font-medium">Disk:</span>{' '}
-                <span className="text-muted-foreground">
-                  {latestMetrics?.diskUsage.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <div className="text-sm">
-                <span className="font-medium">GPU:</span>{' '}
-                <span className="text-muted-foreground">
-                  {latestMetrics?.gpuUsage.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Time Range */}
-          {sortedMetrics.length > 0 && (
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{formatDate(sortedMetrics[0].timestamp)}</span>
-              <span>{formatDate(sortedMetrics[sortedMetrics.length - 1].timestamp)}</span>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
