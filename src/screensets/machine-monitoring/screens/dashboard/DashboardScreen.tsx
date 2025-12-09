@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useScreenTranslations, useTranslation, I18nRegistry, Language } from '@hai3/uicore';
+import { useEffect, useMemo, useRef } from 'react';
+import { useScreenTranslations, useTranslation, I18nRegistry, Language, useAppDispatch, useAppSelector } from '@hai3/uicore';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@hai3/uikit';
 import { MACHINE_MONITORING_SCREENSET_ID, DASHBOARD_SCREEN_ID } from '../../ids';
-import { monitoringApiClient } from '../../api/monitoringApiClient';
-import type { MachineInfo, MetricsSnapshot, Process, TimeRange } from '../../api/mockData';
+import { selectMachinesState } from '../../slices/machinesSlice';
+import { selectMetricsState } from '../../slices/metricsSlice';
+import { selectProcessesState } from '../../slices/processesSlice';
+import { fetchMachines, selectMachine, changeTimeRange } from '../../actions/monitoringActions';
+import type { TimeRange } from '../../api/mockData';
 import { MetricCard } from './components/MetricCard';
 import { ProcessTable } from './components/ProcessTable';
 import { MachineInfoCard } from './components/MachineInfoCard';
@@ -52,13 +55,12 @@ export default function DashboardScreen() {
   const { t } = useTranslation();
   const tk = (key: string) => t(`screen.${MACHINE_MONITORING_SCREENSET_ID}.${DASHBOARD_SCREEN_ID}:${key}`);
 
-  const [machines, setMachines] = useState<MachineInfo[]>([]);
-  const [selectedMachineId, setSelectedMachineId] = useState<string>('');
-  const [timeRange, setTimeRange] = useState<TimeRange>('1day');
-  const [currentMetrics, setCurrentMetrics] = useState<MetricsSnapshot | null>(null);
-  const [rangeMetrics, setRangeMetrics] = useState<MetricsSnapshot[]>([]);
-  const [processes, setProcesses] = useState<Process[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+
+  // Select from Redux store
+  const { machines, selectedMachineId, loading: machinesLoading } = useAppSelector(selectMachinesState);
+  const { currentMetrics, rangeMetrics, timeRange, loading: metricsLoading } = useAppSelector(selectMetricsState);
+  const { processes } = useAppSelector(selectProcessesState);
 
   const selectedMachine = useMemo(
     () => machines.find(m => m.id === selectedMachineId),
@@ -77,31 +79,33 @@ export default function DashboardScreen() {
     };
   }, [rangeMetrics]);
 
-  useEffect(() => {
-    void monitoringApiClient.getMachines().then(data => {
-      setMachines(data);
-      if (data.length > 0) {
-        setSelectedMachineId(data[0].id);
-      }
-      setLoading(false);
-    });
-  }, []);
+  // Track previous selectedMachineId to detect changes
+  const prevSelectedMachineIdRef = useRef<string | null>(null);
 
+  // Fetch machines on mount
   useEffect(() => {
-    if (!selectedMachineId) return;
+    dispatch(fetchMachines());
+  }, [dispatch]);
 
-    setLoading(true);
-    void Promise.all([
-      monitoringApiClient.getCurrentMetrics(selectedMachineId),
-      monitoringApiClient.getMetrics(selectedMachineId, timeRange),
-      monitoringApiClient.getProcesses(selectedMachineId),
-    ]).then(([metrics, range, procs]) => {
-      setCurrentMetrics(metrics);
-      setRangeMetrics(range);
-      setProcesses(procs);
-      setLoading(false);
-    });
+  // Fetch metrics when selectedMachineId changes (including auto-select on mount)
+  useEffect(() => {
+    if (selectedMachineId && selectedMachineId !== prevSelectedMachineIdRef.current) {
+      prevSelectedMachineIdRef.current = selectedMachineId;
+      selectMachine(selectedMachineId, timeRange);
+    }
   }, [selectedMachineId, timeRange]);
+
+  const handleMachineSelect = (machineId: string) => {
+    selectMachine(machineId, timeRange);
+  };
+
+  const handleTimeRangeChange = (newTimeRange: string) => {
+    if (selectedMachineId) {
+      dispatch(changeTimeRange(newTimeRange as TimeRange, selectedMachineId));
+    }
+  };
+
+  const loading = machinesLoading || metricsLoading;
 
   if (loading && machines.length === 0) {
     return (
@@ -132,7 +136,7 @@ export default function DashboardScreen() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <label className="text-sm font-medium">{tk('machine_selector.label')}</label>
-            <Select value={selectedMachineId} onValueChange={setSelectedMachineId}>
+            <Select value={selectedMachineId || ''} onValueChange={handleMachineSelect}>
               <SelectTrigger className="w-80">
                 <SelectValue placeholder={tk('machine_selector.placeholder')} />
               </SelectTrigger>
@@ -148,7 +152,7 @@ export default function DashboardScreen() {
 
           <div className="flex items-center gap-4">
             <label className="text-sm font-medium">{tk('time_range.label')}</label>
-            <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
+            <Select value={timeRange} onValueChange={handleTimeRangeChange}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>

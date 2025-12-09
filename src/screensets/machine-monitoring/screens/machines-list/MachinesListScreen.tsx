@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useScreenTranslations, useTranslation, I18nRegistry, Language, navigateToScreen } from '@hai3/uicore';
+import { useScreenTranslations, useTranslation, I18nRegistry, Language, navigateToScreen, useAppDispatch, useAppSelector } from '@hai3/uicore';
 import { Card, CardContent } from '@hai3/uikit';
 import { MACHINE_MONITORING_SCREENSET_ID, MACHINES_LIST_SCREEN_ID, DASHBOARD_SCREEN_ID } from '../../ids';
-import { monitoringApiClient } from '../../api/monitoringApiClient';
+import { selectFleetState } from '../../slices/fleetSlice';
+import { fetchFleetData } from '../../actions/monitoringActions';
 import type { MachineFleetInfo, LocationCategory, IssueType } from '../../api/mockData';
 import { MachineCard } from './components/MachineCard';
 import { MachineTableRow } from './components/MachineTableRow';
@@ -51,7 +52,6 @@ const translations = I18nRegistry.createLoader({
   [Language.ChineseTraditional]: () => import('./i18n/zh-TW.json'),
 });
 
-type FleetStats = Awaited<ReturnType<typeof monitoringApiClient.getFleetStatistics>>;
 type ViewMode = 'grid' | 'table';
 
 export default function MachinesListScreen() {
@@ -59,31 +59,28 @@ export default function MachinesListScreen() {
   const { t } = useTranslation();
   const tk = (key: string) => t(`screen.${MACHINE_MONITORING_SCREENSET_ID}.${MACHINES_LIST_SCREEN_ID}:${key}`);
 
-  const [machines, setMachines] = useState<MachineFleetInfo[]>([]);
-  const [stats, setStats] = useState<FleetStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+
+  // Select from Redux store
+  const { machines, statistics: stats, loading } = useAppSelector(selectFleetState);
+
+  // Local UI state (filters and view mode)
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-  // SSH Modal state
+  // SSH Modal state (local)
   const [sshModalOpen, setSSHModalOpen] = useState(false);
   const [sshTarget, setSSHTarget] = useState<{ hostname: string; ipAddress: string } | null>(null);
 
-  // Filters
+  // Filters (local state - presentation only)
   const [search, setSearch] = useState('');
   const [locationFilter, setLocationFilter] = useState<LocationCategory | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'online' | 'offline' | 'maintenance'>('all');
   const [issueTypeFilter, setIssueTypeFilter] = useState<IssueType | 'all'>('all');
 
+  // Fetch fleet data on mount
   useEffect(() => {
-    void Promise.all([
-      monitoringApiClient.getFleetMachines(),
-      monitoringApiClient.getFleetStatistics(),
-    ]).then(([machineData, statsData]) => {
-      setMachines(machineData);
-      setStats(statsData);
-      setLoading(false);
-    });
-  }, []);
+    dispatch(fetchFleetData());
+  }, [dispatch]);
 
   const filteredMachines = useMemo(() => {
     let result = machines;
@@ -174,7 +171,7 @@ export default function MachinesListScreen() {
       </div>
 
       {/* Stats Cards */}
-      {stats && (
+      {stats && stats.locationCounts && stats.issuesByType && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <FleetStatsCard stats={stats} tk={tk} />
           <IssuesSummaryCard title={tk('issues.title')} stats={stats} tk={tk} />
