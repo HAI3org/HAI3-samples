@@ -35,8 +35,10 @@ Add new screen "{screenName}" to {screenset} screenset.
 - Add to menu: {Y/N}
 
 ## Component Plan
-- uikit/: {presentational components}
-- screens/{screen}/components/: {screen-specific components}
+- REQUIRED: Use @hai3/uikit components first; local uikit only if missing.
+- uikit/base/: rare primitives (inline styles allowed, needs justification)
+- uikit/composite/: screenset composites (theme tokens only)
+- screens/{screen}/components/: screen-specific components
 
 ## Data Flow
 - Uses existing screenset events/slices per EVENTS.md

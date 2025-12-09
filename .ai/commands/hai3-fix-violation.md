@@ -28,9 +28,7 @@
 Change code to comply with target file rules.
 
 ## STEP 5: Verify
-```bash
-npm run arch:check && npm run lint && npm run type-check
-```
+Run: npm run arch:check && npm run lint && npm run type-check
 REQUIRED: All checks must pass.
 
 ## STEP 6: Report
@@ -45,6 +43,6 @@ REQUIRED: All checks must pass.
 - Import violations: BAD import from '@hai3/uikit/src/Foo' -> GOOD import from '@hai3/uikit'
 - String literals: BAD screenId: 'dashboard' -> GOOD export const DASHBOARD_SCREEN_ID = 'dashboard'
 - Inline component: Extract to screens/{screen}/components/ or uikit/ per SCREENSETS.md
-- Inline style: BAD style={{ padding: 10 }} -> GOOD className="p-2"
+- Inline style: BAD style={{ padding: 10 }} -> GOOD className="p-2" (except in uikit/base/)
 - Inline data: Move to api/{domain}/mocks.ts, fetch via event-driven flow
 - UIKit impurity: Move component from uikit/ to components/ if needs @hai3/uicore

@@ -13,13 +13,15 @@
 - Cross-package: BAD import from '@hai3/uikit/src/internal' -> GOOD import from '@hai3/uikit'.
 
 ## Components
+- REQUIRED: Check global @hai3/uikit first; screenset uikit only if missing.
 - App/screensets: REQUIRED import { Button } from '@hai3/uikit'.
 - FORBIDDEN: Raw HTML elements for UI.
-- FORBIDDEN: Manual styling.
 - FORBIDDEN: Inline component definitions in *Screen.tsx.
 
 ## Component Placement
-- REQUIRED: Presentational components in screensets/{name}/uikit/.
+- REQUIRED: Screenset uikit/ structure: base/, composite/, icons/.
+- REQUIRED: uikit/base/ for rare primitives (inline styles allowed).
+- REQUIRED: uikit/composite/ for screenset composites (theme tokens only).
 - REQUIRED: Shared components in screensets/{name}/components/.
 - REQUIRED: Screen-local components in screens/{screen}/components/.
 - REQUIRED: Screen files orchestrate components only.
@@ -31,9 +33,10 @@
 - REQUIRED: apiRegistry.register(MY_DOMAIN, MyService).
 
 ## Styling
+- Inline styles ONLY in screensets/*/uikit/base/ (rare local primitives).
 - BAD style={{ backgroundColor: '#fff' }} -> GOOD className="bg-background".
 - BAD style={{ color: '#000' }} -> GOOD className="text-foreground".
-- REQUIRED: Use Tailwind utilities, CSS variables only.
+- REQUIRED: Use Tailwind utilities, CSS variables elsewhere.
 
 ## i18n
 - REQUIRED: i18nRegistry.registerLoader('screenset.demo', loader).

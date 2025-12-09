@@ -43,12 +43,12 @@ import {
   DropdownMenuRadioGroup,
   Avatar,
   AvatarImage,
-  AvatarFallback
+  AvatarFallback,
+  Input
 } from '@hai3/uikit';
 import { useTranslation, TextLoader } from '@hai3/uicore';
 import { CalendarDays } from 'lucide-react';
 import { StarIcon } from '../uikit/icons/StarIcon';
-import { FormInput } from '../uikit/icons/FormInput';
 import { DEMO_SCREENSET_ID } from "../ids";
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../ids";
 
@@ -651,7 +651,7 @@ export const OverlayElements: React.FC = () => {
                             {tk('popover_width_label')}
                           </label>
                         </TextLoader>
-                        <FormInput
+                        <Input
                           id="width"
                           defaultValue="100%"
                           className="col-span-2 h-8"
@@ -663,7 +663,7 @@ export const OverlayElements: React.FC = () => {
                             {tk('popover_height_label')}
                           </label>
                         </TextLoader>
-                        <FormInput
+                        <Input
                           id="height"
                           defaultValue="25px"
                           className="col-span-2 h-8"

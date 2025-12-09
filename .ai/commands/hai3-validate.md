@@ -20,12 +20,13 @@ REQUIRED: Must pass with zero errors.
 
 ## STEP 3: Check Common Violations
 - Direct slice dispatch (use event-driven actions instead).
-- Hardcoded colors or inline styles.
+- Inline styles outside base uikit folders (uikit/base/ only).
 - Import violations (package internals, circular dependencies).
 - String literal IDs (must use constants or enums).
 - Inline component definitions in *Screen.tsx files.
 - Inline data arrays (must use API services).
 - @hai3/uicore imports in screensets/*/uikit/ folders.
+- Screenset uikit component when global @hai3/uikit has equivalent.
 
 ## STEP 4: Verify Event-Driven Flow
 - Actions emit events (not dispatch slices).

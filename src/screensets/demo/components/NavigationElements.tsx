@@ -48,12 +48,12 @@ import {
   CardContent,
   CardFooter,
   Button,
+  Label,
+  Input,
 } from '@hai3/uikit';
 import { useTranslation, TextLoader } from '@hai3/uicore';
 import { Slash } from 'lucide-react';
 import { DEMO_SCREENSET_ID } from "../ids";
-import { FormInput } from '../uikit/icons/FormInput';
-import { FormLabel } from '../uikit/icons/FormLabel';
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../ids";
 
 /**
@@ -486,12 +486,12 @@ export const NavigationElements: React.FC = () => {
                   </CardHeader>
                   <CardContent className="grid gap-6">
                     <div className="grid gap-3">
-                      <FormLabel htmlFor="tabs-demo-name">{tk('tabs_name')}</FormLabel>
-                      <FormInput id="tabs-demo-name" defaultValue="Pedro Duarte" />
+                      <Label htmlFor="tabs-demo-name">{tk('tabs_name')}</Label>
+                      <Input id="tabs-demo-name" defaultValue="Pedro Duarte" />
                     </div>
                     <div className="grid gap-3">
-                      <FormLabel htmlFor="tabs-demo-username">{tk('tabs_username')}</FormLabel>
-                      <FormInput id="tabs-demo-username" defaultValue="@peduarte" />
+                      <Label htmlFor="tabs-demo-username">{tk('tabs_username')}</Label>
+                      <Input id="tabs-demo-username" defaultValue="@peduarte" />
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -509,12 +509,12 @@ export const NavigationElements: React.FC = () => {
                   </CardHeader>
                   <CardContent className="grid gap-6">
                     <div className="grid gap-3">
-                      <FormLabel htmlFor="tabs-demo-current">{tk('tabs_current_password')}</FormLabel>
-                      <FormInput id="tabs-demo-current" type="password" />
+                      <Label htmlFor="tabs-demo-current">{tk('tabs_current_password')}</Label>
+                      <Input id="tabs-demo-current" type="password" />
                     </div>
                     <div className="grid gap-3">
-                      <FormLabel htmlFor="tabs-demo-new">{tk('tabs_new_password')}</FormLabel>
-                      <FormInput id="tabs-demo-new" type="password" />
+                      <Label htmlFor="tabs-demo-new">{tk('tabs_new_password')}</Label>
+                      <Input id="tabs-demo-new" type="password" />
                     </div>
                   </CardContent>
                   <CardFooter>

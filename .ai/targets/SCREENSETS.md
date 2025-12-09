@@ -11,7 +11,7 @@
 - Screensets may define local actions, events, slices, effects, API services, and localization.
 
 ## CRITICAL RULES
-- Manual styling is FORBIDDEN; use @hai3/uikit components only.
+- REQUIRED: Use @hai3/uikit components; manual styling only in uikit/base/.
 - Data flow must follow EVENTS.md.
 - State management must follow @hai3/uicore Redux+Flux pattern.
 - Screensets are isolated; no hardcoded screenset names in shared code.
@@ -71,10 +71,12 @@
 - Screenset icons do not go into UiKitIcon enum.
 
 ## SCREENSET UI KIT RULES
-- REQUIRED: Screenset uikit/ folder for icons and presentational components only.
+- REQUIRED: Prioritize global @hai3/uikit components; create local only if missing.
+- REQUIRED: Screenset uikit/ structure: base/, composite/, icons/ (mirrors global).
+- REQUIRED: uikit/base/ for rare primitives; needs strong justification.
+- REQUIRED: uikit/composite/ for screenset-specific composites (value/onChange).
 - FORBIDDEN: @hai3/uicore imports in screensets/*/uikit/ (except types).
-- REQUIRED: Presentational pattern (value/onChange, no hooks, no side effects).
-- REQUIRED: Theme tokens only (no inline styles, no hex colors).
+- REQUIRED: Inline styles allowed ONLY in uikit/base/; composite uses theme tokens.
 
 ## COMPONENT PLACEMENT RULES
 - REQUIRED: Decompose screens into components BEFORE writing screen file.
@@ -87,13 +89,10 @@
 - DETECT: eslint local/screen-inline-components
 
 ## PRE-DIFF CHECKLIST
-- [ ] No manual styling, inline styles, or hex colors.
-- [ ] No custom store patterns; slices use registerSlice with RootState augmentation.
+- [ ] @hai3/uikit used; local uikit only if missing (inline styles in base/ only).
+- [ ] Slices use registerSlice with RootState augmentation.
 - [ ] No direct slice imports; no barrel exports in events/ or effects/.
-- [ ] Icons exported and registered; API service isolated.
+- [ ] Icons exported; API service isolated; events/effects split by domain.
 - [ ] All text uses t(); loaders use I18nRegistry.createLoader.
-- [ ] useScreenTranslations for screen-level translations.
-- [ ] Namespaces follow screenset.id and screen.screenset.screen.
-- [ ] Events and effects split by domain.
-- [ ] No inline component definitions in *Screen.tsx.
-- [ ] No inline data arrays; data from API services per EVENTS.md.
+- [ ] useScreenTranslations for screen-level; namespaces: screenset.id, screen.screenset.screen.
+- [ ] No inline components or data arrays in *Screen.tsx.

@@ -2,88 +2,75 @@
 # hai3:new-component - Add New UI Component
 
 ## AI WORKFLOW (REQUIRED)
-1) Gather requirements from user.
-2) Determine component type.
-3) Create OpenSpec proposal for approval.
-4) After approval, apply implementation.
+1) Check if @hai3/uikit has equivalent component first.
+2) Gather requirements from user.
+3) Determine type: screenset composite (default) | screenset base (rare).
+4) Create OpenSpec proposal for approval.
+5) After approval, apply implementation.
+
+## CHECK GLOBAL UIKIT FIRST
+- REQUIRED: Before creating screenset component, verify @hai3/uikit lacks equivalent.
+- REQUIRED: Import from @hai3/uikit if component exists there.
 
 ## GATHER REQUIREMENTS
 Ask user for:
 - Component name (e.g., "DataTable", "ColorPicker").
-- Component type: base (from shadcn) | screenset-specific.
+- Component type: screenset composite (default) | screenset base (rare).
 - Component description and props.
+- If screenset base: justification why composite is insufficient.
 
-## IF BASE COMPONENT (SHADCN)
-Base components don't need OpenSpec - run directly:
-```bash
-npx shadcn add {component}
-```
-Component will be added to packages/uikit/src/base/. No further changes needed.
+## IF SCREENSET COMPONENT
 
-## IF SCREENSET-SPECIFIC COMPONENT
+### STEP 0: Determine Subfolder
+- uikit/composite/: Screenset-specific composites (theme tokens only).
+- uikit/base/: Rare primitives needing inline styles (needs strong justification).
 
 ### STEP 1: Create OpenSpec Proposal
-Create `openspec/changes/add-{screenset}-{component}/` with:
+Create openspec/changes/add-{screenset}-{component}/ with:
 
 #### proposal.md
-```markdown
-# Proposal: Add {ComponentName} Component
-
-## Summary
-Add new screenset-specific component "{ComponentName}" to {screenset} screenset.
-
-## Details
-- Screenset: {screenset}
-- Component name: {ComponentName}
-- Description: {description}
-- Props: {props}
-
-## Implementation
-Create reusable component following HAI3 patterns (no Redux, no business logic).
-```
+- Summary: Add new screenset-specific component to {screenset}.
+- Details: Screenset, component name, placement (base/composite), description, props.
+- Justification (if base/): Why global uikit insufficient, why composite insufficient.
+- Implementation: HAI3 patterns (no Redux, no business logic).
 
 #### tasks.md
-```markdown
-# Tasks: Add {ComponentName} Component
-
-- [ ] Create component file
-- [ ] Implement props interface
-- [ ] Add theme token styling
-- [ ] Export from local index
-- [ ] Validate: `npm run arch:check`
-- [ ] Test in UI
-```
+- Create component file in uikit/{base|composite}/.
+- Implement props interface.
+- Add theme token styling (or inline for base/).
+- Export from local index if needed.
+- Validate: npm run arch:check.
+- Test in UI.
 
 ### STEP 2: Wait for Approval
-Tell user: "I've created an OpenSpec proposal at `openspec/changes/add-{screenset}-{component}/`. Please review and run `/openspec:apply add-{screenset}-{component}` to implement."
+Tell user: "Review proposal at openspec/changes/add-{screenset}-{component}/."
+Tell user: "Run /openspec:apply add-{screenset}-{component} to implement."
 
 ### STEP 3: Apply Implementation (after approval)
-When user runs `/openspec:apply`, execute:
+When user runs /openspec:apply:
 
 #### 3.1 Create Component
-File: src/screensets/{screenset}/uikit/{ComponentName}.tsx
-- Follow same rules as composite components.
+File: src/screensets/{screenset}/uikit/{base|composite}/{ComponentName}.tsx
+- composite/: Use theme tokens only (no inline styles).
+- base/: May use inline styles (rare, needs justification).
 - Must be reusable within the screenset.
-- NO @hai3/uicore imports or hooks.
+- NO @hai3/uicore imports (except types).
 - NO Redux or state management.
 - Accept value/onChange pattern for state.
-- Use theme tokens for styling.
 
 #### 3.2 Export
 Export from local index if needed.
 
 #### 3.3 Validation
-```bash
-npm run arch:check
-npm run dev
-```
+Run: npm run arch:check && npm run dev
 Test component in UI.
 
 #### 3.4 Mark Tasks Complete
 Update tasks.md to mark all completed tasks.
 
 ## RULES
-- NO Redux, NO business logic, NO side effects in components.
-- Accept value/onChange pattern for state.
-- Use theme tokens for styling.
-- Manual styling is FORBIDDEN; use @hai3/uikit components only.
+- REQUIRED: Check @hai3/uikit first; screenset uikit only if missing.
+- REQUIRED: Screenset base components need strong justification.
+- FORBIDDEN: Redux, business logic, side effects in components.
+- FORBIDDEN: Inline styles outside uikit/base/.
+- REQUIRED: Accept value/onChange pattern for state.

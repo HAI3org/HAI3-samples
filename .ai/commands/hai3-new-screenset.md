@@ -38,9 +38,11 @@ Add new {category} screenset "{screensetName}" with {screens} screen(s).
 - Initial screens: {screens}
 
 ## Component Plan
-- uikit/: {presentational components}
-- components/: {multi-screen components}
-- screens/{screen}/components/: {screen-specific components}
+- REQUIRED: Use @hai3/uikit components first; local uikit only if missing.
+- uikit/base/: rare primitives (inline styles allowed, needs justification)
+- uikit/composite/: screenset composites (theme tokens only)
+- components/: multi-screen components
+- screens/{screen}/components/: screen-specific components
 
 ## Data Flow
 - Events: {domain events per EVENTS.md}
