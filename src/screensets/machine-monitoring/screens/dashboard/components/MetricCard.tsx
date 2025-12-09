@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@hai3/uikit';
 import { useMemo, useState } from 'react';
+import { ProgressBar } from '../../../uikit/base/ProgressBar';
+import { PositionedTooltip } from '../../../uikit/base/PositionedTooltip';
 
 interface MetricCardProps {
   title: string;
@@ -20,21 +22,21 @@ const colorClasses = {
 };
 
 const strokeColors = {
-  blue: '#3b82f6',
-  purple: '#a855f7',
-  orange: '#f97316',
-  green: '#22c55e',
-  cyan: '#06b6d4',
-  indigo: '#6366f1',
+  blue: 'hsl(var(--chart-1))',
+  purple: 'hsl(var(--chart-2))',
+  orange: 'hsl(var(--chart-3))',
+  green: 'hsl(var(--chart-4))',
+  cyan: 'hsl(var(--chart-5))',
+  indigo: 'hsl(var(--chart-1))',
 };
 
 const fillColors = {
-  blue: 'rgba(59, 130, 246, 0.1)',
-  purple: 'rgba(168, 85, 247, 0.1)',
-  orange: 'rgba(249, 115, 22, 0.1)',
-  green: 'rgba(34, 197, 94, 0.1)',
-  cyan: 'rgba(6, 182, 212, 0.1)',
-  indigo: 'rgba(99, 102, 241, 0.1)',
+  blue: 'hsl(var(--chart-1) / 0.1)',
+  purple: 'hsl(var(--chart-2) / 0.1)',
+  orange: 'hsl(var(--chart-3) / 0.1)',
+  green: 'hsl(var(--chart-4) / 0.1)',
+  cyan: 'hsl(var(--chart-5) / 0.1)',
+  indigo: 'hsl(var(--chart-1) / 0.1)',
 };
 
 const iconPaths = {
@@ -180,29 +182,22 @@ export function MetricCard({ title, value, unit, icon, color, history = [] }: Me
               )}
             </svg>
             {tooltip && (
-              <div
-                className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-popover border border-border rounded shadow-lg text-xs whitespace-nowrap z-10 pointer-events-none"
-                style={{
-                  left: `${(tooltip.x / 100) * 100}%`,
-                }}
-              >
+              <PositionedTooltip leftPercent={tooltip.x}>
                 <div className="font-semibold">{tooltip.value.toFixed(1)} {unit}</div>
                 <div className="text-muted-foreground text-[10px]">
                   {history.length - tooltip.index} {history.length - tooltip.index === 1 ? 'day ago' : 'days ago'}
                 </div>
-              </div>
+              </PositionedTooltip>
             )}
           </div>
         )}
 
         {percentage !== null && (
           <div className="mt-3">
-            <div className="w-full bg-muted rounded-full h-1.5">
-              <div
-                className={`h-1.5 rounded-full ${colorClasses[color]}`}
-                style={{ width: `${Math.min(100, percentage)}%` }}
-              />
-            </div>
+            <ProgressBar
+              value={percentage}
+              barClassName={colorClasses[color]}
+            />
           </div>
         )}
       </CardContent>

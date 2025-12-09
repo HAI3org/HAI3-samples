@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Input, Badge } from '@hai3/uikit';
 import type { Process } from '../../../api/mockData';
 import { orderBy } from 'lodash';
+import { ProgressBar } from '../../../uikit/base/ProgressBar';
 
 interface ProcessTableProps {
   processes: Process[];
@@ -177,12 +178,11 @@ export function ProcessTable({ processes, tk }: ProcessTableProps) {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span>{process.cpuPercent.toFixed(1)}%</span>
-                          <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-blue-500"
-                              style={{ width: `${Math.min(100, process.cpuPercent)}%` }}
-                            />
-                          </div>
+                          <ProgressBar
+                            value={process.cpuPercent}
+                            className="w-16 overflow-hidden"
+                            barClassName="bg-blue-500"
+                          />
                         </div>
                       </td>
                       <td className="px-4 py-3">{formatBytes(process.rssMemory)}</td>

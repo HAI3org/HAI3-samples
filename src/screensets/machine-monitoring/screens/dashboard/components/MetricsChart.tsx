@@ -70,10 +70,10 @@ export function MetricsChart({ metrics, tk }: MetricsChartProps) {
               preserveAspectRatio="none"
               className="w-full h-full"
             >
-              {createPath('cpuUsage', '#3b82f6')}
-              {createPath('ramUsage', '#a855f7')}
-              {createPath('diskUsage', '#f97316')}
-              {createPath('gpuUsage', '#22c55e')}
+              {createPath('cpuUsage', 'hsl(var(--chart-1))')}
+              {createPath('ramUsage', 'hsl(var(--chart-2))')}
+              {createPath('diskUsage', 'hsl(var(--chart-3))')}
+              {createPath('gpuUsage', 'hsl(var(--chart-4))')}
             </svg>
           </div>
 
