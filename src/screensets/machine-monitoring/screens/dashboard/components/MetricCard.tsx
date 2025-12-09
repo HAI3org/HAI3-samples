@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle, AreaChart, Area, ResponsiveContainer, ChartContainer, ChartTooltip, ChartTooltipContent } from '@hai3/uikit';
+import { Card, CardContent, CardHeader, CardTitle, AreaChart, Area, ResponsiveContainer, ChartTooltip } from '@hai3/uikit';
 import { useMemo } from 'react';
 import { ProgressBar } from '../../../uikit/base/ProgressBar';
 
@@ -34,8 +34,11 @@ const iconPaths = {
   memory: 'M4 6h16v2H4V6zm0 4h16v2H4v-2zm0 4h16v2H4v-2zm0 4h16v2H4v-2z',
   disk: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
   gpu: 'M3 3h18v18H3V3zm2 2v14h14V5H5zm2 2h10v10H7V7z',
-  network: 'M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z',
+  network: 'M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z',
 };
+
+// Icons that should be filled instead of stroked
+const filledIcons = ['network'];
 
 /**
  * Get chart color from CSS variables (theme-aware)
@@ -84,8 +87,8 @@ export function MetricCard({ title, value, unit, icon, color, history = [] }: Me
             width="20"
             height="20"
             viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
+            fill={filledIcons.includes(icon) ? 'white' : 'none'}
+            stroke={filledIcons.includes(icon) ? 'none' : 'white'}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -120,22 +123,20 @@ export function MetricCard({ title, value, unit, icon, color, history = [] }: Me
         </div>
 
         {chartData && (
-          <div className="mt-3 h-16">
-            <ChartContainer>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke={chartColor}
-                    fill={chartColor}
-                    fillOpacity={0.1}
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+          <div className="mt-3 h-16 w-full">
+            <ResponsiveContainer width="100%" height={64}>
+              <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+                <ChartTooltip />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke={chartColor}
+                  fill={chartColor}
+                  fillOpacity={0.1}
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         )}
 

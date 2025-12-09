@@ -60,19 +60,25 @@ export function ProcessTable({ processes, tk }: ProcessTableProps) {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) {
+    const isActive = sortField === field;
+
+    if (!isActive) {
+      // Inactive: show subtle up/down arrows
       return (
-        <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        <svg className="w-4 h-4 flex-shrink-0 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 15l4 4 4-4" />
         </svg>
       );
     }
+
+    // Active: show single arrow based on direction
     return sortDirection === 'asc' ? (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
       </svg>
     ) : (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
       </svg>
     );
@@ -165,17 +171,17 @@ export function ProcessTable({ processes, tk }: ProcessTableProps) {
                   </tr>
                 ) : (
                   filteredAndSortedProcesses.map(process => (
-                    <tr key={process.pid} className="border-b hover:bg-muted/30">
-                      <td className="px-4 py-3 font-mono text-xs">{process.pid}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{process.name}</span>
+                    <tr key={process.pid} className="border-b hover:bg-muted/30 h-12">
+                      <td className="px-4 py-2 font-mono text-xs">{process.pid}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          <span className="font-medium truncate max-w-[150px]">{process.name}</span>
                           <Badge variant={process.status === 'running' ? 'default' : 'secondary'}>
                             {process.status}
                           </Badge>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-2">
                         <div className="flex items-center gap-2">
                           <span>{process.cpuPercent.toFixed(1)}%</span>
                           <ProgressBar
@@ -185,12 +191,12 @@ export function ProcessTable({ processes, tk }: ProcessTableProps) {
                           />
                         </div>
                       </td>
-                      <td className="px-4 py-3">{formatBytes(process.rssMemory)}</td>
-                      <td className="px-4 py-3">{formatBytes(process.virtualMemory)}</td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      <td className="px-4 py-2">{formatBytes(process.rssMemory)}</td>
+                      <td className="px-4 py-2">{formatBytes(process.virtualMemory)}</td>
+                      <td className="px-4 py-2 text-xs text-muted-foreground">
                         {formatTime(process.startTime)}
                       </td>
-                      <td className="px-4 py-3 max-w-md">
+                      <td className="px-4 py-2 max-w-md">
                         <div className="truncate font-mono text-xs text-muted-foreground" title={process.command}>
                           {process.command}
                         </div>

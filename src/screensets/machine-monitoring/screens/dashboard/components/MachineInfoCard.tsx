@@ -35,14 +35,16 @@ function InfoItem({ icon, label, value, badge, iconColor = 'bg-blue-500' }: Info
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-xs font-medium text-muted-foreground mb-1">{label}</div>
-        <div className="text-sm font-medium truncate" title={value}>
-          {value}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium truncate" title={value}>
+            {value}
+          </span>
+          {badge && (
+            <Badge variant="secondary" className="text-xs whitespace-nowrap">
+              {badge}
+            </Badge>
+          )}
         </div>
-        {badge && (
-          <Badge variant="secondary" className="mt-1 text-xs">
-            {badge}
-          </Badge>
-        )}
       </div>
     </div>
   );

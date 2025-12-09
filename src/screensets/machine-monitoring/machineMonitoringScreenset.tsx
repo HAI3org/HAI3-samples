@@ -1,7 +1,27 @@
-import { type ScreensetConfig, ScreensetCategory, uikitRegistry, I18nRegistry, Language, screensetRegistry } from '@hai3/uicore';
+import { type ScreensetConfig, ScreensetCategory, uikitRegistry, I18nRegistry, Language, screensetRegistry, registerSlice, apiRegistry } from '@hai3/uicore';
 import { MACHINE_MONITORING_SCREENSET_ID, DASHBOARD_SCREEN_ID, MACHINES_LIST_SCREEN_ID } from './ids';
 import { MonitorIcon, MONITOR_ICON_ID } from './uikit/icons/MonitorIcon';
 import { ServerIcon, SERVER_ICON_ID } from './uikit/icons/ServerIcon';
+
+// Import slices
+import machinesSlice from './slices/machinesSlice';
+import metricsSlice from './slices/metricsSlice';
+import processesSlice from './slices/processesSlice';
+import fleetSlice from './slices/fleetSlice';
+
+// Import effects
+import { initializeMachinesEffects } from './effects/machinesEffects';
+import { initializeMetricsEffects } from './effects/metricsEffects';
+import { initializeProcessesEffects } from './effects/processesEffects';
+import { initializeFleetEffects } from './effects/fleetEffects';
+
+// Import for side effect - register API service
+import { MONITORING_DOMAIN } from './api/MonitoringApiService';
+import './api/MonitoringApiService';
+import { monitoringMockMap } from './api/mocks';
+
+// Register mock data for API service
+apiRegistry.registerMocks(MONITORING_DOMAIN, monitoringMockMap);
 
 /**
  * Screenset-level translations
@@ -54,6 +74,25 @@ const screensetTranslations = I18nRegistry.createLoader({
 uikitRegistry.registerIcons({
   [MONITOR_ICON_ID]: <MonitorIcon />,
   [SERVER_ICON_ID]: <ServerIcon />,
+});
+
+/**
+ * Register monitoring domain slices dynamically with uicore store
+ * Screensets can add their state without modifying uicore package
+ * Each domain (machines, metrics, processes, fleet) has its own slice
+ * The slice.name property is automatically used as the state key
+ */
+registerSlice(machinesSlice, (dispatch) => {
+  initializeMachinesEffects(dispatch);
+});
+registerSlice(metricsSlice, (dispatch) => {
+  initializeMetricsEffects(dispatch);
+});
+registerSlice(processesSlice, (dispatch) => {
+  initializeProcessesEffects(dispatch);
+});
+registerSlice(fleetSlice, (dispatch) => {
+  initializeFleetEffects(dispatch);
 });
 
 /**
