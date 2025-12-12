@@ -1,15 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useTranslation, TextLoader, useScreenTranslations, I18nRegistry, Language } from '@hai3/uicore';
 import { CategoryMenu } from './CategoryMenu';
-import { DataDisplayElements } from '../../components/DataDisplayElements';
-import { LayoutElements } from '../../components/LayoutElements';
-import { ActionElements } from '../../components/ActionElements';
-import { FeedbackElements } from '../../components/FeedbackElements';
-import { MediaElements } from '../../components/MediaElements';
-import { FormElements } from '../../components/FormElements';
-import { OverlayElements } from '../../components/OverlayElements';
-import { DisclosureElements } from '../../components/DisclosureElements';
-import { NavigationElements } from '../../components/NavigationElements';
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../../ids";
 import { DEMO_SCREENSET_ID } from "../../ids";
 import { UIKIT_CATEGORIES, IMPLEMENTED_ELEMENTS, getElementId } from './uikitCategories';
@@ -55,6 +46,36 @@ const translations = I18nRegistry.createLoader({
   [Language.ChineseSimplified]: () => import('./i18n/zh.json'),
   [Language.ChineseTraditional]: () => import('./i18n/zh-TW.json'),
 });
+
+// Dynamic imports for element components (code splitting)
+// Each component will be loaded only when its category is selected
+const DataDisplayElements = lazy(() => 
+  import('../../components/DataDisplayElements').then(m => ({ default: m.DataDisplayElements }))
+);
+const LayoutElements = lazy(() => 
+  import('../../components/LayoutElements').then(m => ({ default: m.LayoutElements }))
+);
+const ActionElements = lazy(() => 
+  import('../../components/ActionElements').then(m => ({ default: m.ActionElements }))
+);
+const FeedbackElements = lazy(() => 
+  import('../../components/FeedbackElements').then(m => ({ default: m.FeedbackElements }))
+);
+const MediaElements = lazy(() => 
+  import('../../components/MediaElements').then(m => ({ default: m.MediaElements }))
+);
+const FormElements = lazy(() => 
+  import('../../components/FormElements').then(m => ({ default: m.FormElements }))
+);
+const OverlayElements = lazy(() => 
+  import('../../components/OverlayElements').then(m => ({ default: m.OverlayElements }))
+);
+const DisclosureElements = lazy(() => 
+  import('../../components/DisclosureElements').then(m => ({ default: m.DisclosureElements }))
+);
+const NavigationElements = lazy(() => 
+  import('../../components/NavigationElements').then(m => ({ default: m.NavigationElements }))
+);
 
 /**
  * UI Kit Elements Screen
@@ -174,7 +195,15 @@ export const UIKitElementsScreen: React.FC = () => {
 
         {/* Content Area */}
         <div className="flex-1 max-w-3xl flex flex-col gap-8">
-          {renderCategoryElements()}
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <TextLoader skeletonClassName="h-8 w-full">
+                <p className="text-muted-foreground">Loading elements...</p>
+              </TextLoader>
+            </div>
+          }>
+            {renderCategoryElements()}
+          </Suspense>
         </div>
       </div>
     </div>
