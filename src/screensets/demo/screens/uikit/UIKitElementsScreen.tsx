@@ -118,11 +118,18 @@ export const UIKitElementsScreen: React.FC = () => {
         const elementId = getElementId(firstImplementedElement);
         setActiveElementId(elementId);
 
-        // Scroll to the element instantly
-        const targetElement = document.querySelector(`[data-element-id="${elementId}"]`);
-        if (targetElement) {
-          targetElement.scrollIntoView({ behavior: 'auto', block: 'start' });
-        }
+        // Use requestAnimationFrame to ensure DOM has settled before scrolling
+        requestAnimationFrame(() => {
+          const targetElement = document.querySelector(`[data-element-id="${elementId}"]`);
+          const scrollContainer = document.querySelector('main');
+          if (targetElement && scrollContainer) {
+            // Calculate scroll position relative to the scroll container
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const targetRect = targetElement.getBoundingClientRect();
+            const scrollTop = scrollContainer.scrollTop + targetRect.top - containerRect.top;
+            scrollContainer.scrollTo({ top: scrollTop, behavior: 'auto' });
+          }
+        });
       }
     }
   };
@@ -130,10 +137,18 @@ export const UIKitElementsScreen: React.FC = () => {
   // Handle element click from menu
   const handleElementClick = (elementId: string) => {
     setActiveElementId(elementId);
-    const targetElement = document.querySelector(`[data-element-id="${elementId}"]`);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'auto', block: 'start' });
-    }
+    // Use requestAnimationFrame to ensure DOM has settled before scrolling
+    requestAnimationFrame(() => {
+      const targetElement = document.querySelector(`[data-element-id="${elementId}"]`);
+      const scrollContainer = document.querySelector('main');
+      if (targetElement && scrollContainer) {
+        // Calculate scroll position relative to the scroll container
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const targetRect = targetElement.getBoundingClientRect();
+        const scrollTop = scrollContainer.scrollTop + targetRect.top - containerRect.top;
+        scrollContainer.scrollTo({ top: scrollTop, behavior: 'auto' });
+      }
+    });
   };
 
   // Render the appropriate category component
