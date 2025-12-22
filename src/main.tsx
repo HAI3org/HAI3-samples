@@ -2,6 +2,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HAI3Provider, apiRegistry, store } from '@hai3/uicore';
+import { Toaster } from '@hai3/uikit';
 import '@hai3/uikit/styles'; // UI Kit styles
 import '@/uikit/uikitRegistry'; // Auto-registers UI Kit (components + icons)
 import '@/screensets/screensetRegistry'; // Auto-registers screensets (includes API services + mocks + i18n loaders)
@@ -30,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HAI3Provider>
       <App />
+      <Toaster />
     </HAI3Provider>
   </StrictMode>
 );

@@ -1,12 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Checkbox, RadioGroup, RadioGroupItem, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, NativeSelect, NativeSelectOption, NativeSelectOptGroup, InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator, Textarea, Input, Label, Button, Popover, PopoverContent, PopoverTrigger, ChevronDownIcon } from '@hai3/uikit';
+import {
+  // Base
+  Calendar,
+  Checkbox,
+  Input,
+  Label,
+  Switch,
+  Textarea,
+  // Select
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+  NativeSelect,
+  NativeSelectOptGroup,
+  NativeSelectOption,
+  // Radio
+  RadioGroup,
+  RadioGroupItem,
+  // Field
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+  // Input Group
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
+  // Date Picker
+  DatePicker,
+  DatePickerTrigger,
+  DatePickerContent,
+  DatePickerInput,
+  // Input OTP
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from '@hai3/uikit';
 import { ButtonVariant } from '@hai3/uikit-contracts';
+import { Copy, RefreshCw, CornerDownLeft } from 'lucide-react';
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 import { format } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
 import { useTranslation, TextLoader } from '@hai3/uicore';
 import { DEMO_SCREENSET_ID } from "../ids";
 import { UI_KIT_ELEMENTS_SCREEN_ID } from "../ids";
+import { ProfileForm } from "../uikit/forms/ProfileForm";
 
 /**
  * Form Elements Component
@@ -31,8 +80,14 @@ export const FormElements: React.FC = () => {
   });
   const [dropdownMode, setDropdownMode] = useState<React.ComponentProps<typeof Calendar>["captionLayout"]>("dropdown");
   const [dropdownDate, setDropdownDate] = useState<Date | undefined>(new Date(2025, 5, 12));
-  const [dateTimeOpen, setDateTimeOpen] = useState(false);
-  const [dateTimeDate, setDateTimeDate] = useState<Date | undefined>(undefined);
+
+  // Date Picker state
+  const [basicPickerDate, setBasicPickerDate] = useState<Date | undefined>(undefined);
+  const [dobPickerDate, setDobPickerDate] = useState<Date | undefined>(undefined);
+  const [dobPickerOpen, setDobPickerOpen] = useState(false);
+  const [inputPickerDate, setInputPickerDate] = useState<Date | undefined>(new Date(2025, 5, 1));
+  const [dateTimePickerDate, setDateTimePickerDate] = useState<Date | undefined>(undefined);
+  const [dateTimePickerOpen, setDateTimePickerOpen] = useState(false);
 
   // Get timezone on mount
   useEffect(() => {
@@ -107,7 +162,6 @@ export const FormElements: React.FC = () => {
                 className="rounded-lg border shadow-sm"
               />
               <div className="flex flex-col gap-2">
-                <label className="text-xs text-muted-foreground px-1">Dropdown Mode</label>
                 <Select
                   value={dropdownMode}
                   onValueChange={(value) => setDropdownMode(value as React.ComponentProps<typeof Calendar>["captionLayout"])}
@@ -125,43 +179,123 @@ export const FormElements: React.FC = () => {
             </div>
           </div>
 
+        </div>
+      </div>
+
+      {/* Date Picker Element Block */}
+      <div data-element-id="element-date-picker" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-32">
+          <h2 className="text-2xl font-semibold">
+            {tk('date_picker_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-8 p-6 border border-border rounded-lg bg-background overflow-hidden">
+
+          {/* Basic Date Picker */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('date_picker_basic_label')}
+              </label>
+            </TextLoader>
+            <DatePicker date={basicPickerDate} onDateChange={setBasicPickerDate}>
+              <DatePickerTrigger placeholder={tk('date_picker_select_date')} />
+              <DatePickerContent />
+            </DatePicker>
+          </div>
+
+          {/* Date of Birth Picker */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('date_picker_dob_label')}
+              </label>
+            </TextLoader>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="dob-picker" className="px-1">
+                {tk('date_picker_dob_field_label')}
+              </Label>
+              <DatePicker
+                date={dobPickerDate}
+                onDateChange={setDobPickerDate}
+                open={dobPickerOpen}
+                onOpenChange={setDobPickerOpen}
+                formatDate={(date) => date.toLocaleDateString()}
+              >
+                <DatePickerTrigger
+                  id="dob-picker"
+                  icon="chevron"
+                  className="w-48"
+                  placeholder={tk('date_picker_select_date')}
+                />
+                <DatePickerContent
+                  calendarProps={{ captionLayout: "dropdown" }}
+                />
+              </DatePicker>
+            </div>
+          </div>
+
+          {/* Date Picker with Input */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('date_picker_input_label')}
+              </label>
+            </TextLoader>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="input-picker" className="px-1">
+                {tk('date_picker_input_field_label')}
+              </Label>
+              <DatePicker
+                date={inputPickerDate}
+                onDateChange={setInputPickerDate}
+                formatDate={(date) => format(date, "MMMM dd, yyyy")}
+              >
+                <DatePickerInput
+                  id="input-picker"
+                  placeholder={tk('date_picker_input_placeholder')}
+                />
+              </DatePicker>
+            </div>
+          </div>
+
           {/* Date and Time Picker */}
           <div className="flex flex-col gap-2">
-            <TextLoader skeletonClassName="h-4 w-36" inheritColor>
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
               <label className="text-xs text-muted-foreground">
-                {tk('calendar_datetime_label')}
+                {tk('date_picker_datetime_label')}
               </label>
             </TextLoader>
             <div className="flex gap-4 flex-wrap">
-              <div className="flex flex-col gap-2">
-                <label className="text-xs text-muted-foreground px-1">Date</label>
-                <Popover open={dateTimeOpen} onOpenChange={setDateTimeOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={ButtonVariant.Outline}
-                      className="w-32 justify-between font-normal"
-                    >
-                      {dateTimeDate ? dateTimeDate.toLocaleDateString() : "Select date"}
-                      <ChevronDownIcon className="size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={dateTimeDate}
-                      captionLayout="dropdown"
-                      onSelect={(date) => {
-                        setDateTimeDate(date);
-                        setDateTimeOpen(false);
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="datetime-picker" className="px-1">
+                  {tk('date_picker_date_label')}
+                </Label>
+                <DatePicker
+                  date={dateTimePickerDate}
+                  onDateChange={setDateTimePickerDate}
+                  open={dateTimePickerOpen}
+                  onOpenChange={setDateTimePickerOpen}
+                  formatDate={(date) => date.toLocaleDateString()}
+                >
+                  <DatePickerTrigger
+                    id="datetime-picker"
+                    icon="chevron"
+                    className="w-32"
+                    placeholder={tk('date_picker_select_date')}
+                  />
+                  <DatePickerContent
+                    calendarProps={{ captionLayout: "dropdown" }}
+                  />
+                </DatePicker>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-xs text-muted-foreground px-1">Time</label>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="time-picker" className="px-1">
+                  {tk('date_picker_time_label')}
+                </Label>
                 <Input
                   type="time"
+                  id="time-picker"
                   step="1"
                   defaultValue="10:30:00"
                   className="bg-background w-32 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
@@ -465,6 +599,196 @@ export const FormElements: React.FC = () => {
                 {tk('input_name_label')} <span className="text-destructive">*</span>
               </Label>
               <Input type="text" id="name-required" required />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Field Element Block */}
+      <div data-element-id="element-field" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-24">
+          <h2 className="text-2xl font-semibold">
+            {tk('field_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Basic Field */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-32" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('field_basic_label')}
+              </label>
+            </TextLoader>
+            <Field>
+              <FieldLabel htmlFor="field-email">{tk('field_email_label')}</FieldLabel>
+              <Input type="email" id="field-email" />
+              <FieldDescription>{tk('field_email_description')}</FieldDescription>
+            </Field>
+          </div>
+
+          {/* Field with Error */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('field_error_label')}
+              </label>
+            </TextLoader>
+            <Field data-invalid="true">
+              <FieldLabel htmlFor="field-error">{tk('field_password_label')}</FieldLabel>
+              <Input type="password" id="field-error" />
+              <FieldError>{tk('field_password_error')}</FieldError>
+            </Field>
+          </div>
+
+          {/* Field Group */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('field_group_label')}
+              </label>
+            </TextLoader>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="field-first-name">{tk('field_first_name_label')}</FieldLabel>
+                <Input type="text" id="field-first-name" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="field-last-name">{tk('field_last_name_label')}</FieldLabel>
+                <Input type="text" id="field-last-name" />
+              </Field>
+            </FieldGroup>
+          </div>
+
+          {/* Field Set */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('field_set_label')}
+              </label>
+            </TextLoader>
+            <FieldSet>
+              <FieldLegend>{tk('field_contact_info_legend')}</FieldLegend>
+              <Field>
+                <FieldLabel htmlFor="field-phone">{tk('field_phone_label')}</FieldLabel>
+                <Input type="tel" id="field-phone" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="field-address">{tk('field_address_label')}</FieldLabel>
+                <Input type="text" id="field-address" />
+              </Field>
+            </FieldSet>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Element Block */}
+      <div data-element-id="element-form" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-24">
+          <h2 className="text-2xl font-semibold">
+            {tk('form_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Profile Form with Validation */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('form_profile_label')}
+              </label>
+            </TextLoader>
+            <ProfileForm tk={tk} />
+          </div>
+        </div>
+      </div>
+
+      {/* Input Group Element Block */}
+      <div data-element-id="element-input-group" className="flex flex-col gap-4">
+        <TextLoader skeletonClassName="h-8 w-32">
+          <h2 className="text-2xl font-semibold">
+            {tk('input_group_heading')}
+          </h2>
+        </TextLoader>
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
+          {/* Input with Button Addon */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_group_button_label')}
+              </label>
+            </TextLoader>
+            <div className="grid w-full max-w-sm gap-4">
+              <InputGroup>
+                <InputGroupInput placeholder={tk('input_group_url_placeholder')} readOnly />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    aria-label={tk('input_group_copy_label')}
+                    title={tk('input_group_copy_label')}
+                    size="icon-xs"
+                  >
+                    <Copy className="size-3.5" />
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+              <InputGroup>
+                <InputGroupInput placeholder={tk('input_group_search_placeholder')} />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton variant={ButtonVariant.Secondary}>
+                    {tk('input_group_search_button')}
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+          </div>
+
+          {/* Input with Label Addon */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_group_label_label')}
+              </label>
+            </TextLoader>
+            <div className="grid w-full max-w-sm gap-4">
+              <InputGroup>
+                <InputGroupInput id="input-group-email" placeholder={tk('input_group_username_placeholder')} />
+                <InputGroupAddon align="inline-end">
+                  <Label htmlFor="input-group-email">@example.com</Label>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+          </div>
+
+          {/* Textarea with Addons */}
+          <div className="flex flex-col gap-2">
+            <TextLoader skeletonClassName="h-4 w-40" inheritColor>
+              <label className="text-xs text-muted-foreground">
+                {tk('input_group_textarea_label')}
+              </label>
+            </TextLoader>
+            <div className="w-full max-w-md">
+              <InputGroup>
+                <InputGroupTextarea
+                  id="textarea-code"
+                  placeholder={tk('input_group_code_placeholder')}
+                  className="min-h-[200px]"
+                />
+                <InputGroupAddon align="block-end" className="border-t">
+                  <InputGroupText>{tk('input_group_line_info')}</InputGroupText>
+                  <InputGroupButton size="sm" className="ml-auto" variant={ButtonVariant.Default}>
+                    {tk('input_group_run_button')} <CornerDownLeft className="size-3.5" />
+                  </InputGroupButton>
+                </InputGroupAddon>
+                <InputGroupAddon align="block-start" className="border-b">
+                  <InputGroupText className="font-mono font-medium">
+                    script.js
+                  </InputGroupText>
+                  <InputGroupButton className="ml-auto" size="icon-xs">
+                    <RefreshCw className="size-3.5" />
+                  </InputGroupButton>
+                  <InputGroupButton variant={ButtonVariant.Ghost} size="icon-xs">
+                    <Copy className="size-3.5" />
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
             </div>
           </div>
         </div>

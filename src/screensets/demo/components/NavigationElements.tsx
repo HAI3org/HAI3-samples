@@ -291,7 +291,7 @@ export const NavigationElements: React.FC = () => {
             {tk('navigation_menu_heading')}
           </h2>
         </TextLoader>
-        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background">
+        <div className="flex flex-col gap-6 p-6 border border-border rounded-lg bg-background overflow-hidden">
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>

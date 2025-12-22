@@ -49,8 +49,8 @@ export const ExpandableButton: React.FC<ExpandableButtonProps> = ({
 
   // State-dependent styles
   const stateStyles = isActive
-    ? 'bg-accent text-accent-foreground'
-    : 'text-foreground hover:bg-accent/50 hover:text-accent-foreground';
+    ? 'text-primary bg-accent/50'
+    : 'text-muted-foreground hover:text-foreground hover:bg-accent/30';
 
   // Disabled styles
   const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : '';
@@ -60,6 +60,7 @@ export const ExpandableButton: React.FC<ExpandableButtonProps> = ({
 
   return (
     <button
+      type="button"
       className={`${baseStyles} ${stateStyles} ${disabledStyles} ${className}`.trim()}
       disabled={disabled}
       {...props}

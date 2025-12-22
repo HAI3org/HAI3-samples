@@ -35,6 +35,7 @@ export const MenuItemButton = forwardRef<HTMLButtonElement, MenuItemButtonProps>
   return (
     <button
       ref={ref}
+      type="button"
       className={`${baseStyles} ${stateStyles} ${className}`.trim()}
       {...props}
     >

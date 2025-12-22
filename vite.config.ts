@@ -49,6 +49,11 @@ export default defineConfig({
               return 'vendor-input-otp';
             }
 
+            // Split form libraries (react-hook-form + zod + resolvers)
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
+              return 'vendor-forms';
+            }
+
             // Split Radix UI primitives (they're relatively small individually but many)
             if (id.includes('@radix-ui')) {
               return 'vendor-radix';

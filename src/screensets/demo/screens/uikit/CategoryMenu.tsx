@@ -73,7 +73,11 @@ export const CategoryMenu: React.FC<CategoryMenuProps> = ({
                         <MenuItemButton
                           key={element}
                           isActive={isActiveElement}
-                          onClick={() => onElementClick?.(elementId)}
+                          onClick={(e) => {
+                            // Blur button to prevent focus-related scroll issues
+                            e.currentTarget.blur();
+                            onElementClick?.(elementId);
+                          }}
                         >
                           {tk(elementTranslationKey)}
                         </MenuItemButton>
