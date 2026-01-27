@@ -28,7 +28,7 @@
     "@hai3/uikit": "^0.1.0-alpha.11",
     "@hai3/uikit-contracts": "^0.1.0-alpha.1",
     "@reduxjs/toolkit": "^2.2.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
